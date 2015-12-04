@@ -298,8 +298,8 @@ namespace S2SMtDemoClient
         private async Task ConnectAsync(SpeechClientOptions options, bool suspendInputAudioDuringTTS)
         {
             // Authenticate
-            string admClientId = "Kelly_TAP";
-            string admClientSecret = "Xle9BS7/wwJ5BI4clUrOV+Z1ysVYoPNqRU/DMGdJAnk=";
+            string admClientId = "ENTER CLIENT_ID";
+            string admClientSecret = "Xle9BS7--ENTER CLIENT SECRET--NqRU/DMGdJAnk=";
             string ADMScope = "http://api.microsofttranslator.com";
             string ADMTokenUri = "https://datamarket.accesscontrol.windows.net/v2/OAuth2-13";
             ADMToken ADMAuthenticator = new ADMToken(ADMTokenUri, ADMScope);
