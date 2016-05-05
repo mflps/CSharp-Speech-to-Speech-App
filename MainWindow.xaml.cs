@@ -171,8 +171,8 @@ namespace S2SMtDemoClient
         private async Task UpdateLanguageSettingsAsync() //build the URI for the call to get the languages - 
         {
             string scheme = (SecureConnection.IsChecked.Value) ? "https" : "http"; //build the URI
-            Uri baseUri = new Uri(scheme + "://" + BaseUri.Text);
-            Uri fullUri = new Uri(baseUri, "/api/Languages?scope=text,speech,tts");
+             Uri baseUri = new Uri(scheme + "://" + BaseUri.Text);
+            Uri fullUri = new Uri(baseUri, "/Languages?api-version=1.0&scope=text,speech,tts");
 
             using (HttpClient client = new HttpClient()) //'client' is the var - using statment ensures the dispose method is used even after an exception.
             {
@@ -207,7 +207,10 @@ namespace S2SMtDemoClient
                 // From and To ASR languages
                 foreach (JProperty jSpeech in jResponse["speech"])
                 {
-                    spokenLanguages.Add(jSpeech.Name, jSpeech.Value.ToString());
+                    JObject languageDetails = (JObject)jSpeech.Value;
+                    string code = jSpeech.Name;
+                    string displayName = languageDetails["name"].ToString();
+                    spokenLanguages.Add(code, displayName);
                 }
 
                 spokenLanguages = spokenLanguages.OrderBy(x => x.Value).ToDictionary(x => x.Key, x => x.Value);
