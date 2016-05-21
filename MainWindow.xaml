@@ -35,6 +35,7 @@
                     <ComboBoxItem Content="api\speech\translate" IsSelected="True"/>
                     <ComboBoxItem Content="api\speech\detect-and-translate"/>
                 </ComboBox>
+                <Button x:Name="SettingsButton" Content="Account Settings" Grid.Column="1" HorizontalAlignment="Left" Margin="6,6" VerticalAlignment="Top" Width="Auto" Click="SettingsButton_Click" Background="#FFACACAC"/>
             </StackPanel>
             <Label x:Name="AudioBytesSentLabel" Grid.Row="0" Grid.Column="1" Content="000000000" VerticalAlignment="Top" HorizontalAlignment="Right" Width="80"/>
             <Label Grid.Row="1" Grid.Column="0" Content="Microphone/File input" VerticalAlignment="Center" />
@@ -53,8 +54,8 @@
             <ComboBox x:Name="Voice2" Grid.Row="5" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Width="120" Margin="150,0,0,0"/>
             <Label Grid.Row="6" Grid.Column="0" Content="Features" VerticalAlignment="Center" />
             <StackPanel Orientation="Horizontal" Grid.Row="6" Grid.Column="1" VerticalAlignment="Center">
-                <CheckBox x:Name="FeaturePartials" Content="Partials" IsChecked="False" />
-                <CheckBox x:Name="FeatureTTS" Content="TTS" IsChecked="True" Margin="20,0,0,0" />
+                <CheckBox x:Name="FeaturePartials" Content="Partials" IsChecked="True" />
+                <CheckBox x:Name="FeatureTTS" Content="TTS" Margin="20,0,0,0" />
                 <CheckBox x:Name="FeatureTurnSignals" Content="TurnSignals" IsChecked="False" Margin="20,0,0,0" IsEnabled="False"/>
                 <CheckBox x:Name="FeatureAlternatives" Content="Alternatives" IsChecked="False" Margin="20,0,0,0" IsEnabled="False"/>
                 <CheckBox x:Name="FeatureContinuous" Content="Continuous recognition" IsChecked="True" Margin="20,0,0,0" IsEnabled="False"/>

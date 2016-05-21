@@ -118,7 +118,7 @@ namespace S2SMtDemoClient
             // Special case: audio source is a file
             Mic.Items.Add(new ComboBoxItem() { Content = "Play audio from file", Tag = "File" });
 
-            Mic.SelectedIndex = 0; //select a mic
+            Mic.SelectedIndex = Properties.Settings.Default.MicIndex;
 
             int waveOutDevices = WaveOut.DeviceCount; //get the waveout device count
             for (int waveOutDevice = 0; waveOutDevice < waveOutDevices; waveOutDevice++) //get all the wavout audio devices on the device and put them in a combo box
@@ -127,7 +127,7 @@ namespace S2SMtDemoClient
                 Speaker.Items.Add(new ComboBoxItem() { Content = deviceInfo.ProductName, Tag = waveOutDevice });
             }
 
-            Speaker.SelectedIndex = 0; //select an audio out device
+            Speaker.SelectedIndex = Properties.Settings.Default.SpeakerIndex;
 
             // To make secure connections work with Redmond test servers
             ServicePointManager.ServerCertificateValidationCallback = new RemoteCertificateValidationCallback(HttpsCertificateValidator.ValidateServerCertificate);
@@ -171,7 +171,7 @@ namespace S2SMtDemoClient
         private async Task UpdateLanguageSettingsAsync() //build the URI for the call to get the languages - 
         {
             string scheme = (SecureConnection.IsChecked.Value) ? "https" : "http"; //build the URI
-             Uri baseUri = new Uri(scheme + "://" + BaseUri.Text);
+            Uri baseUri = new Uri(scheme + "://" + BaseUri.Text);
             Uri fullUri = new Uri(baseUri, "/Languages?api-version=1.0&scope=text,speech,tts");
 
             using (HttpClient client = new HttpClient()) //'client' is the var - using statment ensures the dispose method is used even after an exception.
@@ -266,6 +266,7 @@ namespace S2SMtDemoClient
                 string tag = selectedItem.Tag as string;
                 this.AudioFileInput.Visibility = (tag == "File") ? Visibility.Visible : Visibility.Collapsed;
                 this.AudioFileInputButton.Visibility = this.AudioFileInput.Visibility;
+                Properties.Settings.Default.MicIndex = Mic.SelectedIndex;
             }
         }
 
@@ -301,8 +302,8 @@ namespace S2SMtDemoClient
         private async Task ConnectAsync(SpeechClientOptions options, bool suspendInputAudioDuringTTS)
         {
             // Authenticate
-            string admClientId = "ENTER CLIENT_ID";
-            string admClientSecret = "Xle9BS7--ENTER CLIENT SECRET--NqRU/DMGdJAnk=";
+            string admClientId = Properties.Settings.Default.ClientID;
+            string admClientSecret = Properties.Settings.Default.ClientSecret;
             string ADMScope = "http://api.microsofttranslator.com";
             string ADMTokenUri = "https://datamarket.accesscontrol.windows.net/v2/OAuth2-13";
             ADMToken ADMAuthenticator = new ADMToken(ADMTokenUri, ADMScope);
@@ -1015,8 +1016,8 @@ namespace S2SMtDemoClient
                     break;
                 case UiState.ReadyToConnect:
                     this.StartListening.IsEnabled = true;
-                    this.SetMessage(string.Format("Set your options, then click Connect to start."), "", MessageKind.Status);
-                    this.StartListening.Content = "Connect";
+                    this.SetMessage(string.Format("Set your options, then click \"Start\" to start."), "", MessageKind.Status);
+                    this.StartListening.Content = "Start";
                     break;
                 case UiState.Connecting:
                     this.StartListening.IsEnabled = false;
@@ -1038,7 +1039,7 @@ namespace S2SMtDemoClient
                         this.SetMessage("Recognition for language #2 will show here...",
                             "Translation for language #2 will show here...", MessageKind.ChatDetect2);
                     }
-                    this.StartListening.Content = "Disconnect";
+                    this.StartListening.Content = "Stop";
                     //this.TraceCmd.Text = this.GetTraceCmd();
                     this.Log("I: {0}", this.TraceCmd.Text);
                     isInputAllowed = false;
@@ -1121,6 +1122,11 @@ namespace S2SMtDemoClient
             return settings;
         }
 
+        private void SettingsButton_Click(object sender, RoutedEventArgs e)
+        {
+            SettingsWindow sw = new SettingsWindow();
+            sw.Show();
+        }
     }
 
     [DataContract]
