@@ -51,12 +51,12 @@ namespace S2SMtDemoClient
         private enum OperationMode { SpeechTranslate, SpeechDetectAndTranslate }
 
         private enum MessageKind  //list of items for use throughout the code
-        { 
+        {
             Chat, // Translate mode
             ChatDetect1, // Detect and translate - result for first language
             ChatDetect2, // Detect and translate - result for second language
-            Error, 
-            Status 
+            Error,
+            Status
         }
 
         private UiState currentState; //create a variable of enum type UiState
@@ -97,17 +97,21 @@ namespace S2SMtDemoClient
         // When auto-saving, save the slice Logs.Items[autoSaveFrom:]
         private int autoSaveFrom = 0;
 
-        private class TTsDetail 
+        private class TTsDetail
         {
             public string Code { get; set; }
             public string DisplayName { get; set; }
         }
 
+        private MiniWindow miniwindow;
+
         public MainWindow()
         {
             InitializeComponent();
-
             Debug.Print("This is a debug message");
+
+            miniwindow = new MiniWindow();
+            this.Closing += MainWindow_Closing;
 
             int waveInDevices = WaveIn.DeviceCount; //how many recording devices are there on the device
             for (int waveInDevice = 0; waveInDevice < waveInDevices; waveInDevice++) //loop through and find all of the devices
@@ -132,8 +136,31 @@ namespace S2SMtDemoClient
             // To make secure connections work with Redmond test servers
             ServicePointManager.ServerCertificateValidationCallback = new RemoteCertificateValidationCallback(HttpsCertificateValidator.ValidateServerCertificate);
 
+            MiniWindow_Lines.Items.Add(new ComboBoxItem() { Content = "1" });
+            MiniWindow_Lines.Items.Add(new ComboBoxItem() { Content = "2" });
+            MiniWindow_Lines.Items.Add(new ComboBoxItem() { Content = "3" });
+            MiniWindow_Lines.Items.Add(new ComboBoxItem() { Content = "4" });
+            MiniWindow_Lines.Items.Add(new ComboBoxItem() { Content = "5" });
+            MiniWindow_Lines.Items.Add(new ComboBoxItem() { Content = "6" });
+            MiniWindow_Lines.Items.Add(new ComboBoxItem() { Content = "7" });
+            MiniWindow_Lines.Items.Add(new ComboBoxItem() { Content = "8" });
+            MiniWindow_Lines.Items.Add(new ComboBoxItem() { Content = "9" });
+
+            MiniWindow_Lines.SelectedIndex = Properties.Settings.Default.MiniWindow_Lines;
+            miniwindow.SetFontSize(Properties.Settings.Default.MiniWindow_Lines);
+
             UpdateUiForOperationMode(OperationMode.SpeechTranslate); //call a function passing an enum object
-            UpdateLanguageSettings(); //call a function with no arguements
+            UpdateLanguageSettings(); //call a function with no arguments
+            ShowMiniWindow.IsChecked = Properties.Settings.Default.ShowMiniWindow;
+        }
+
+
+
+        private void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if (miniwindow != null) miniwindow.Close();
+            Properties.Settings.Default.ShowMiniWindow = ShowMiniWindow.IsChecked.Value;
+            Properties.Settings.Default.Save();
         }
 
         private void UpdateHostButton_Click(object sender, RoutedEventArgs e) //this just calls the function right below it.
@@ -144,7 +171,7 @@ namespace S2SMtDemoClient
         private void UpdateLanguageSettings() //this function gets the language list from service by calling updatelanguagesettingsasync that method calls the api
         {
             UpdateUiState(UiState.GettingLanguageList); //call to method defined in this file near the end
-            UpdateLanguageSettingsAsync().ContinueWith((t) => 
+            UpdateLanguageSettingsAsync().ContinueWith((t) =>
                 {
                     var state = UiState.ReadyToConnect;
                     if (t.IsFaulted || t.IsCanceled)
@@ -160,7 +187,7 @@ namespace S2SMtDemoClient
         {
             OperationMode mode = OperationMode.SpeechTranslate; //put the value of the enum into the mode var
             string modeStr = ((ComboBoxItem)this.EndpointComboBox.SelectedItem).Content.ToString();
-            
+
             if (String.Compare(modeStr, @"api\speech\detect-and-translate", StringComparison.OrdinalIgnoreCase) == 0) //compare strings
             {
                 mode = OperationMode.SpeechDetectAndTranslate;
@@ -185,7 +212,7 @@ namespace S2SMtDemoClient
                 spokenLanguages = new Dictionary<string, string>(); //create two dictionaries to receive the languages and the voices data
                 voices = new Dictionary<string, List<TTsDetail>>();
 
-                
+
                 JObject jResponse = JObject.Parse(await response.Content.ReadAsStringAsync()); //get the json from the async call with the response var created above, parse it and put it in a var called jResponse - JObject is a newton class
                 foreach (JProperty jTts in jResponse["tts"])
                 {
@@ -221,9 +248,10 @@ namespace S2SMtDemoClient
                     bool isSelected = (CultureInfo.CurrentUICulture.Name.Equals(language.Key, StringComparison.OrdinalIgnoreCase)) ? true : false;
                     FromLanguage.Items.Add(new ComboBoxItem() { Content = language.Value, Tag = language.Key, IsSelected = isSelected });
                     ToLanguage.Items.Add(new ComboBoxItem() { Content = language.Value, Tag = language.Key });
-                }                
+                }
 
-                ToLanguage.SelectedIndex = 1;
+                ToLanguage.SelectedIndex = Properties.Settings.Default.ToLanguageIndex;
+                FromLanguage.SelectedIndex = Properties.Settings.Default.FromLanguageIndex;
             }
         }
 
@@ -235,6 +263,8 @@ namespace S2SMtDemoClient
                 voiceCombo = this.Voice2;
             }
             this.UpdateVoiceComboBox(voiceCombo, ToLanguage.SelectedItem as ComboBoxItem);
+            Properties.Settings.Default.ToLanguageIndex = ToLanguage.SelectedIndex;
+            miniwindow.DisplayText.Language = System.Windows.Markup.XmlLanguage.GetLanguage(((ComboBoxItem)this.ToLanguage.SelectedItem).Tag.ToString());
         }
 
         private void FromLanguage_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -243,6 +273,7 @@ namespace S2SMtDemoClient
             {
                 this.UpdateVoiceComboBox(this.Voice, FromLanguage.SelectedItem as ComboBoxItem);
             }
+            Properties.Settings.Default.FromLanguageIndex = FromLanguage.SelectedIndex;
         }
 
         private void UpdateVoiceComboBox(System.Windows.Controls.ComboBox voiceComboBox, ComboBoxItem languageSelectedItem)
@@ -332,6 +363,8 @@ namespace S2SMtDemoClient
             {
                 throw new InvalidOperationException("Type of SpeechClientOptions in not supported.");
             }
+
+            if (ShowMiniWindow.IsChecked.Value) miniwindow.Show();
 
             s2smtClient.OnBinaryData += (c, a) => { AddSamplesToPlay(a, suspendInputAudioDuringTTS); };
             s2smtClient.OnEndOfBinaryData += (c, a) => { AddSamplesToPlay(a, suspendInputAudioDuringTTS); };
@@ -436,6 +469,7 @@ namespace S2SMtDemoClient
 
             Stopwatch watch = Stopwatch.StartNew();
             UpdateUiState(UiState.Connecting);
+            miniwindow.Show();
             //This section is putting default values in case there are missing values in the UI
             // Minimal validation
             if (this.IsMissingInput(this.FromLanguage.SelectedItem, "source language")) return;
@@ -661,6 +695,8 @@ namespace S2SMtDemoClient
             if (this.currentState != UiState.Connected) return;
 
             UpdateUiState(UiState.Disconnecting);
+
+            miniwindow.Hide();
 
             if (recorder != null)
             {
@@ -960,7 +996,11 @@ namespace S2SMtDemoClient
             this.BottomRun2.Foreground = foreground2;
             if (top1 != null) this.TopRun1.Text = top1;
             if (top2 != null) this.TopRun2.Text = top2;
-            if (bottom1 != null) this.BottomRun1.Text = bottom1;
+            if (bottom1 != null)
+            {
+                this.BottomRun1.Text = bottom1;
+                if (kind == MessageKind.Chat) miniwindow.DisplayText.Text = bottom1;
+            }
             if (bottom2 != null) this.BottomRun2.Text = bottom2;
         }
 
@@ -1030,7 +1070,7 @@ namespace S2SMtDemoClient
                     if (this.currentOperationMode == OperationMode.SpeechTranslate)
                     {
                         this.SetMessage("Connected! After you start speaking, transcripts in the source language will show here...",
-                            "...and transcripts in the target language will show here.", MessageKind.Chat);
+                            "...and translations to the target language will show here.", MessageKind.Status);
                     }
                     else
                     {
@@ -1127,6 +1167,18 @@ namespace S2SMtDemoClient
             SettingsWindow sw = new SettingsWindow();
             sw.Show();
         }
+
+        private void Speaker_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            Properties.Settings.Default.SpeakerIndex = Speaker.SelectedIndex;
+        }
+
+        private void MiniWindow_Lines_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            miniwindow.SetFontSize(MiniWindow_Lines.SelectedIndex);
+            Properties.Settings.Default.MiniWindow_Lines = MiniWindow_Lines.SelectedIndex;
+        }
+
     }
 
     [DataContract]

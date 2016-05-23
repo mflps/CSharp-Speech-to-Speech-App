@@ -1,0 +1,12 @@
+﻿<Window x:Class="S2SMtDemoClient.MiniWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:S2SMtDemoClient"
+        mc:Ignorable="d"
+        Title="Microsoft Translator" Height="96" Width="500" Opacity="0.8" BorderThickness="1" ShowInTaskbar="False" Topmost="True" ToolTip="Display Window" Margin="1">
+    <Grid>
+        <TextBox x:Name="DisplayText" TextWrapping="Wrap"/>
+    </Grid>
+</Window>

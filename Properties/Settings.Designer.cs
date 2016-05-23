@@ -70,5 +70,101 @@ namespace S2SMtDemoClient.Properties {
                 this["SpeakerIndex"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int FromLanguageIndex {
+            get {
+                return ((int)(this["FromLanguageIndex"]));
+            }
+            set {
+                this["FromLanguageIndex"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int ToLanguageIndex {
+            get {
+                return ((int)(this["ToLanguageIndex"]));
+            }
+            set {
+                this["ToLanguageIndex"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int MiniWindow_Height {
+            get {
+                return ((int)(this["MiniWindow_Height"]));
+            }
+            set {
+                this["MiniWindow_Height"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int MiniWindow_Width {
+            get {
+                return ((int)(this["MiniWindow_Width"]));
+            }
+            set {
+                this["MiniWindow_Width"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int MiniWindow_Left {
+            get {
+                return ((int)(this["MiniWindow_Left"]));
+            }
+            set {
+                this["MiniWindow_Left"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int MiniWindow_Top {
+            get {
+                return ((int)(this["MiniWindow_Top"]));
+            }
+            set {
+                this["MiniWindow_Top"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int MiniWindow_Lines {
+            get {
+                return ((int)(this["MiniWindow_Lines"]));
+            }
+            set {
+                this["MiniWindow_Lines"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ShowMiniWindow {
+            get {
+                return ((bool)(this["ShowMiniWindow"]));
+            }
+            set {
+                this["ShowMiniWindow"] = value;
+            }
+        }
     }
 }
