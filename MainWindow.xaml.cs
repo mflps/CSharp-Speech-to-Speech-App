@@ -244,8 +244,7 @@ namespace S2SMtDemoClient
                 ToLanguage.Items.Clear();
                 foreach (var language in spokenLanguages)
                 {
-                    bool isSelected = (CultureInfo.CurrentUICulture.Name.Equals(language.Key, StringComparison.OrdinalIgnoreCase)) ? true : false;
-                    FromLanguage.Items.Add(new ComboBoxItem() { Content = language.Value, Tag = language.Key, IsSelected = isSelected });
+                    FromLanguage.Items.Add(new ComboBoxItem() { Content = language.Value, Tag = language.Key});
                     ToLanguage.Items.Add(new ComboBoxItem() { Content = language.Value, Tag = language.Key });
                 }
 
