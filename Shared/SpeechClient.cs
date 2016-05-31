@@ -111,25 +111,6 @@ namespace Microsoft.MT.Api.TestUtils
             this.clientWsUri = new Uri(string.Format("{0}://{1}/speech/translate?{2}&api-version=1.0", "wss", this.Hostname, query.ToString()));
         }
 
-        public SpeechClient(SpeechDetectAndTranslateClientOptions options, CancellationToken cancellationToken)
-        {
-            this.Init(options, cancellationToken);
-            StringBuilder query = new StringBuilder();
-            query.AppendFormat("languages={0}", string.Join(",", options.Languages).Replace(" ", ""));
-            if ((options.Voices != null) && (options.Voices.Length > 0))
-            {
-                query.AppendFormat("&voices={0}", string.Join(",", options.Voices).Replace(" ", ""));
-            }
-            if (!String.IsNullOrWhiteSpace(options.Features))
-            {
-                query.AppendFormat("&features={0}", options.Features);
-            }
-            if (!String.IsNullOrWhiteSpace(options.Profanity))
-            {
-                query.AppendFormat("&profanity={0}", options.Profanity);
-            }
-            this.clientWsUri = new Uri(string.Format("{0}://{1}/speech/detect-and-translate?{2}&api-version=1.0", "wss", this.Hostname, query.ToString()));
-        }
 
         private void Init(SpeechClientOptions options, CancellationToken cancellationToken)
         {

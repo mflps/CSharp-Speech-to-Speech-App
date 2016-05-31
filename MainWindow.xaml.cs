@@ -30,15 +30,6 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-/*
-UI:
-no endpoint, use the same
-no dropdown for api, use the same url
-no secure flag -- always ssl
-no turn signals, no alternatives, always contin.reco
-no trace button
-*/
-
 namespace S2SMtDemoClient
 {
 
@@ -57,7 +48,7 @@ namespace S2SMtDemoClient
             Disconnecting
         }
 
-        private enum OperationMode { SpeechTranslate, SpeechDetectAndTranslate }
+        private enum OperationMode { SpeechTranslate }
 
         private enum MessageKind  //list of items for use throughout the code
         {
@@ -106,6 +97,8 @@ namespace S2SMtDemoClient
         // When auto-saving, save the slice Logs.Items[autoSaveFrom:]
         private int autoSaveFrom = 0;
 
+        private string baseUrl = "dev.microsofttranslator.com";
+
         private class TTsDetail
         {
             public string Code { get; set; }
@@ -142,9 +135,7 @@ namespace S2SMtDemoClient
 
             Speaker.SelectedIndex = Properties.Settings.Default.SpeakerIndex;
 
-            // To make secure connections work with Redmond test servers
-            ServicePointManager.ServerCertificateValidationCallback = new RemoteCertificateValidationCallback(HttpsCertificateValidator.ValidateServerCertificate);
-
+            
             MiniWindow_Lines.Items.Add(new ComboBoxItem() { Content = "1" });
             MiniWindow_Lines.Items.Add(new ComboBoxItem() { Content = "2" });
             MiniWindow_Lines.Items.Add(new ComboBoxItem() { Content = "3" });
@@ -158,6 +149,7 @@ namespace S2SMtDemoClient
             MiniWindow_Lines.SelectedIndex = Properties.Settings.Default.MiniWindow_Lines;
             miniwindow.SetFontSize(Properties.Settings.Default.MiniWindow_Lines);
 
+            
             UpdateUiForOperationMode(OperationMode.SpeechTranslate); //call a function passing an enum object
             UpdateLanguageSettings(); //call a function with no arguments
             ShowMiniWindow.IsChecked = Properties.Settings.Default.ShowMiniWindow;
@@ -192,23 +184,11 @@ namespace S2SMtDemoClient
                 });
         }
 
-        private void EndpointComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            //TODO:REMOVE THIS
-            OperationMode mode = OperationMode.SpeechTranslate; //put the value of the enum into the mode var
-            string modeStr = ((ComboBoxItem)this.EndpointComboBox.SelectedItem).Content.ToString();
-
-            if (String.Compare(modeStr, @"api\speech\detect-and-translate", StringComparison.OrdinalIgnoreCase) == 0) //compare strings
-            {
-                mode = OperationMode.SpeechDetectAndTranslate;
-            }
-            this.UpdateUiForOperationMode(mode); //update the UI with enum value
-        }
 
         private async Task UpdateLanguageSettingsAsync() //build the URI for the call to get the languages - 
         {
-            string scheme = (SecureConnection.IsChecked.Value) ? "https" : "http"; //build the URI
-            Uri baseUri = new Uri(scheme + "://" + BaseUri.Text);
+            
+            Uri baseUri = new Uri("https://" + baseUrl);
             Uri fullUri = new Uri(baseUri, "/Languages?api-version=1.0&scope=text,speech,tts");
 
             using (HttpClient client = new HttpClient()) //'client' is the var - using statment ensures the dispose method is used even after an exception.
@@ -268,10 +248,6 @@ namespace S2SMtDemoClient
         private void ToLanguage_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             var voiceCombo = this.Voice;
-            if (this.currentOperationMode == OperationMode.SpeechDetectAndTranslate)
-            {
-                voiceCombo = this.Voice2;
-            }
             this.UpdateVoiceComboBox(voiceCombo, ToLanguage.SelectedItem as ComboBoxItem);
             Properties.Settings.Default.ToLanguageIndex = ToLanguage.SelectedIndex;
             miniwindow.DisplayText.Language = System.Windows.Markup.XmlLanguage.GetLanguage(((ComboBoxItem)this.ToLanguage.SelectedItem).Tag.ToString());
@@ -279,10 +255,6 @@ namespace S2SMtDemoClient
 
         private void FromLanguage_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (this.currentOperationMode == OperationMode.SpeechDetectAndTranslate)
-            {
-                this.UpdateVoiceComboBox(this.Voice, FromLanguage.SelectedItem as ComboBoxItem);
-            }
             Properties.Settings.Default.FromLanguageIndex = FromLanguage.SelectedIndex;
         }
 
@@ -313,9 +285,8 @@ namespace S2SMtDemoClient
 
         private void AudioFileInputButton_Click(object sender, RoutedEventArgs e)
         {
-            var settings = this.ReadUserSettings();
             var dialog = new System.Windows.Forms.OpenFileDialog(); //**this code opens the file UI for file selection
-            dialog.InitialDirectory = settings.OutputDirectory;
+            dialog.InitialDirectory = Properties.Settings.Default.OutputDirectory;
             dialog.Filter = "wav files (*.wav)|*.wav|All files (*.*)|*.*";
             dialog.FilterIndex = 1;
             dialog.RestoreDirectory = true;
@@ -362,13 +333,6 @@ namespace S2SMtDemoClient
                 s2smtClient = new SpeechClient((SpeechTranslateClientOptions)options, CancellationToken.None);
                 textDecoder = TextMessageDecoder.CreateTranslateDecoder();
             }
-            /*
-            else if (options.GetType() == typeof(SpeechDetectAndTranslateClientOptions))
-            {
-                s2smtClient = new SpeechClient((SpeechDetectAndTranslateClientOptions)options, CancellationToken.None);
-                textDecoder = TextMessageDecoder.CreateDetectAndTranslateDecoder();
-                detectAndTranslateLanguages = ((SpeechDetectAndTranslateClientOptions)options).Languages;
-            }*/
             else
             {
                 throw new InvalidOperationException("Type of SpeechClientOptions in not supported.");
@@ -407,40 +371,6 @@ namespace S2SMtDemoClient
                                 Log("Partial translation {0}: {1}", partial.Id, partial.Translation);
                                 this.SafeInvoke(() => SetMessage(partial.Recognition, partial.Translation, MessageKind.Chat));
                             }
-                            /*
-                            if (msg is Microsoft.MT.Api.Protocols.SpeechTranslation.DetectAndTranslate.ResultMessage)
-                            {
-                                var result = msg as Microsoft.MT.Api.Protocols.SpeechTranslation.DetectAndTranslate.ResultMessage;
-                                int idx = 0;
-                                if (String.Compare(detectAndTranslateLanguages[1], result.DetectedLanguage, StringComparison.OrdinalIgnoreCase) == 0)
-                                {
-                                    idx = 1;
-                                }
-                                var recognitionLang = detectAndTranslateLanguages[idx];
-                                var translationLang = detectAndTranslateLanguages[(idx + 1) % 2];
-                                string recognition = string.Empty;
-                                string translation = string.Empty;
-                                if (result.Transcriptions == null)
-                                {
-                                    Log("End of transcription for utterance id {0} spoken in {1}.", result.Id, result.DetectedLanguage);
-                                }
-                                else
-                                {
-                                    result.Transcriptions.TryGetValue(recognitionLang, out recognition);
-                                    result.Transcriptions.TryGetValue(translationLang, out translation);
-                                    Log("{0} recognition {1} {2}: {3}", result.Type.ToString(), recognitionLang, result.Id, recognition);
-                                    Log("{0} translation {1} {2}: {3}", result.Type.ToString(), translationLang, result.Id, recognition);
-                                }
-                                var msgKind = (idx == 0) ? MessageKind.ChatDetect1 : MessageKind.ChatDetect2;
-                                this.SafeInvoke(() => SetMessage(recognition, translation, msgKind));
-                                if (result.Type == Microsoft.MT.Api.Protocols.SpeechTranslation.DetectAndTranslate.ResultType.Final)
-                                {
-                                    // On final, clear up display for the other (non-detected) language.
-                                    msgKind = (idx == 0) ? MessageKind.ChatDetect2 : MessageKind.ChatDetect1;
-                                    this.SafeInvoke(() => SetMessage("", "", msgKind));
-                                }
-                            }
-                            */
                         }
                     });
             };
@@ -487,10 +417,6 @@ namespace S2SMtDemoClient
             if (this.IsMissingInput(this.FromLanguage.SelectedItem, "source language")) return;
             if (this.IsMissingInput(this.ToLanguage.SelectedItem, "target language")) return;
             if (this.IsMissingInput(this.Voice.SelectedItem, "voice")) return;
-            if (this.currentOperationMode == OperationMode.SpeechDetectAndTranslate)
-            {
-                if (this.IsMissingInput(this.Voice2.SelectedItem, "voice2")) return;
-            }
             if (this.IsMissingInput(this.Profanity.SelectedItem, "profanity filter")) return;
             if (this.IsMissingInput(this.Mic.SelectedItem, "microphone")) return;
             if (this.IsMissingInput(this.Speaker.SelectedItem, "speaker")) return;
@@ -517,35 +443,15 @@ namespace S2SMtDemoClient
             this.correlationId = Guid.NewGuid().ToString("D").Split('-')[0].ToUpperInvariant();
 
             // Setup speech translation client options
-            string scheme = (SecureConnection.IsChecked.Value) ? "wss" : "ws";
-
             SpeechClientOptions options;
-            if (this.currentOperationMode == OperationMode.SpeechDetectAndTranslate)
+            options = new SpeechTranslateClientOptions()
             {
-                options = new SpeechDetectAndTranslateClientOptions()
-                {
-                    Languages = new string[] 
-                    {
-                        ((ComboBoxItem)this.FromLanguage.SelectedItem).Tag.ToString(),
-                        ((ComboBoxItem)this.ToLanguage.SelectedItem).Tag.ToString()
-                    },
-                    Voices = new string[] 
-                    { 
-                        ((ComboBoxItem)this.Voice.SelectedItem).Tag.ToString(),
-                        ((ComboBoxItem)this.Voice2.SelectedItem).Tag.ToString()
-                    }
-                };
-            }
-            else
-            {
-                options = new SpeechTranslateClientOptions()
-                {
-                    TranslateFrom = ((ComboBoxItem)this.FromLanguage.SelectedItem).Tag.ToString(),
-                    TranslateTo = ((ComboBoxItem)this.ToLanguage.SelectedItem).Tag.ToString(),
-                    Voice = ((ComboBoxItem)this.Voice.SelectedItem).Tag.ToString(),
-                };
-            }
-            options.Hostname = BaseUri.Text;
+                TranslateFrom = ((ComboBoxItem)this.FromLanguage.SelectedItem).Tag.ToString(),
+                TranslateTo = ((ComboBoxItem)this.ToLanguage.SelectedItem).Tag.ToString(),
+                Voice = ((ComboBoxItem)this.Voice.SelectedItem).Tag.ToString(),
+            };
+            
+            options.Hostname = baseUrl;
             options.AuthHeaderKey = "Authorization";
             options.AuthHeaderValue = ""; // set later in ConnectAsync.
             options.ClientAppId = new Guid("EA66703D-90A8-436B-9BD6-7A2707A2AD99");
@@ -593,8 +499,7 @@ namespace S2SMtDemoClient
             string logAudioFileName = null;
             if (LogSentAudio.IsChecked.Value || LogReceivedAudio.IsChecked.Value)
             {
-                var settings = this.ReadUserSettings();
-                string logAudioPath = System.IO.Path.Combine(settings.OutputDirectory, this.correlationId);
+                string logAudioPath = System.IO.Path.Combine(Properties.Settings.Default.OutputDirectory, this.correlationId);
                 Directory.CreateDirectory(logAudioPath);
 
                 if (LogSentAudio.IsChecked.Value)
@@ -817,10 +722,8 @@ namespace S2SMtDemoClient
                 return;
             }
 
-            var settings = this.ReadUserSettings();
             string cid = String.IsNullOrEmpty(this.correlationId) ? "no-cid" : this.correlationId;
-            string filename = System.IO.Path.Combine(settings.OutputDirectory, string.Format("log-{0}.txt", cid));
-            Directory.CreateDirectory(System.IO.Path.GetDirectoryName(filename));
+            string filename = System.IO.Path.Combine(Properties.Settings.Default.OutputDirectory, string.Format("log-{0}.txt", cid));
             using (var writer = new StreamWriter(filename))
             {
                 for (int i = this.autoSaveFrom; i < Logs.Items.Count; i++)
@@ -833,12 +736,11 @@ namespace S2SMtDemoClient
 
         private void SaveLogs_Click(object sender, RoutedEventArgs e)
         {
-            var settings = this.ReadUserSettings();
+            if(!Directory.Exists(Properties.Settings.Default.OutputDirectory))
+                Directory.CreateDirectory(Properties.Settings.Default.OutputDirectory);
             var dlg = new System.Windows.Forms.SaveFileDialog();
-            dlg.InitialDirectory = settings.OutputDirectory;
-            Directory.CreateDirectory(settings.OutputDirectory);
-            string name = string.Format("log-{0}.txt", String.IsNullOrEmpty(this.correlationId) ? "no-cid" : this.correlationId);
-            dlg.FileName = System.IO.Path.Combine(settings.OutputDirectory, name);
+            dlg.InitialDirectory = Properties.Settings.Default.OutputDirectory;
+            dlg.FileName = string.Format("log-{0}.txt", String.IsNullOrEmpty(this.correlationId) ? "no-cid" : this.correlationId);
             dlg.DefaultExt = "txt";
             dlg.Filter = "txt files (*.txt)|*.txt|All files (*.*)|*.*";
             dlg.FilterIndex = 1;
@@ -928,13 +830,7 @@ namespace S2SMtDemoClient
                 features |= SpeechClient.Features.Partial;
             if (FeatureTTS.IsChecked.Value)
                 features |= SpeechClient.Features.TextToSpeech;
-            //if (FeatureTurnSignals.IsChecked.Value)
-            //    features |= SpeechClient.Features.TurnSignal;
-            //if (FeatureAlternatives.IsChecked.Value)
-            //    features |= SpeechClient.Features.Alternative;
-            //if (FeatureContinuous.IsChecked.Value)
-            //    features |= SpeechClient.Features.Continuous;
-
+            
             return features;
         }
 
@@ -1017,28 +913,21 @@ namespace S2SMtDemoClient
 
         private void UpdateUiForOperationMode(OperationMode mode)
         {
+            /*
             this.currentOperationMode = mode;
             if ((this.Language1Label == null) || (this.Language2Label == null)) return;
 
             switch (this.currentOperationMode)
             {
-                case OperationMode.SpeechDetectAndTranslate:
-                    this.Language1Label.Content = "Language #1";
-                    this.Language2Label.Content = "Language #2";
-                    this.VoiceLabel.Content = "Voices #1 & #2";
-                    this.Voice2.Visibility = Visibility.Visible;
-                    this.UpdateVoiceComboBox(this.Voice, FromLanguage.SelectedItem as ComboBoxItem);
-                    this.UpdateVoiceComboBox(this.Voice2, ToLanguage.SelectedItem as ComboBoxItem);
-                    break;
                 case OperationMode.SpeechTranslate:
                 default:
                     this.Language1Label.Content = "Translate From";
                     this.Language2Label.Content = "Translate To";
                     this.VoiceLabel.Content = "Voice";
-                    this.Voice2.Visibility = Visibility.Collapsed;
                     this.UpdateVoiceComboBox(this.Voice, ToLanguage.SelectedItem as ComboBoxItem);
                     break;
             }
+            */
         }
 
         //this method shows the audio input if an audio file is selected
@@ -1057,12 +946,12 @@ namespace S2SMtDemoClient
             {
                 case UiState.GettingLanguageList:
                     this.StartListening.IsEnabled = false;
-                    this.SetMessage(string.Format("Getting language list from {0}", this.BaseUri.Text), "", MessageKind.Status);
+                    this.SetMessage(string.Format("Getting language list from {0}", this.baseUrl), "", MessageKind.Status);
                     isInputAllowed = false;
                     break;
                 case UiState.MissingLanguageList:
                     this.StartListening.IsEnabled = false;
-                    this.SetMessage(string.Format("Failed to get language list. Check the host and retry."), "", MessageKind.Error);
+                    this.SetMessage(string.Format("Failed to get language list. Please re-enter your account settings."), "", MessageKind.Error);
                     isInputAllowed = true;
                     break;
                 case UiState.ReadyToConnect:
@@ -1105,12 +994,6 @@ namespace S2SMtDemoClient
             }
 
 
-            //****PUT AN IF STATEMENT BASED ON A NEW ADVANCED CHECKBOX, COLLAPSED EVERY CONTROL NOT PART OF BASIC MODE*****
-            this.BaseUri.IsEnabled = isInputAllowed;
-            this.SecureConnection.IsEnabled = isInputAllowed;
-            this.UpdateHostButton.IsEnabled = isInputAllowed;
-            this.EndpointComboBox.IsEnabled = isInputAllowed;
-            this.EndpointComboBox.Visibility = Visibility.Collapsed; //KFA
             this.Mic.IsEnabled = isInputAllowed;
             this.AudioFileInput.IsEnabled = isInputAllowed;
             this.AudioFileInputButton.IsEnabled = isInputAllowed;
@@ -1118,12 +1001,8 @@ namespace S2SMtDemoClient
             this.FromLanguage.IsEnabled = isInputAllowed;
             this.ToLanguage.IsEnabled = isInputAllowed;
             this.Voice.IsEnabled = isInputAllowed;
-            this.Voice2.IsEnabled = isInputAllowed;
             this.FeaturePartials.IsEnabled = isInputAllowed;
             this.FeatureTTS.IsEnabled = isInputAllowed;
-            this.FeatureAlternatives.Visibility = Visibility.Collapsed;
-            this.FeatureTurnSignals.Visibility = Visibility.Collapsed;
-            this.FeatureContinuous.Visibility = Visibility.Collapsed;
             this.UpdateSettings.Visibility = Visibility.Collapsed;
             this.Profanity.IsEnabled = isInputAllowed;
 
@@ -1132,7 +1011,6 @@ namespace S2SMtDemoClient
             this.LogAutoSave.IsEnabled = isInputAllowed;
             this.LogSentAudio.IsEnabled = isInputAllowed;
             this.LogReceivedAudio.IsEnabled = isInputAllowed;
-            this.TraceButton.Visibility = Visibility.Collapsed;
         }
 
         private void SafeInvoke(Action action)
@@ -1147,36 +1025,16 @@ namespace S2SMtDemoClient
             }
         }
 
-        
-
-        private AppUserSettings ReadUserSettings()
-        {
-            var settings = new AppUserSettings()
-            {
-                OutputDirectory = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "MicrosoftTranslatorDev"),
-                APGoldRoot = @"d:\apgold",
-                TcmdPath = @"d:\app\tools"
-            };
-            string path = System.IO.Path.Combine(settings.OutputDirectory, ".s2smtdemoclient.json");
-            if (File.Exists(path))
-            {
-                string json = string.Empty;
-                try
-                {
-                    settings = JsonConvert.DeserializeObject<AppUserSettings>(File.ReadAllText(path));
-                }
-                catch (Exception ex)
-                {
-                    this.Log(ex, "E: Unable to read user settings from file: '{0}'.", path);
-                }
-            }
-            return settings;
-        }
-
         private void SettingsButton_Click(object sender, RoutedEventArgs e)
         {
             SettingsWindow sw = new SettingsWindow();
             sw.Show();
+            sw.Closing += SettingsWindowClosing;
+        }
+
+        private void SettingsWindowClosing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            UpdateLanguageSettings();
         }
 
         private void Speaker_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -1197,10 +1055,6 @@ namespace S2SMtDemoClient
     {
         [DataMember(EmitDefaultValue = false)]
         public string OutputDirectory { get; set; }
-        [DataMember(EmitDefaultValue = false)]
-        public string TcmdPath { get; set; }
-        [DataMember(EmitDefaultValue = false)]
-        public string APGoldRoot { get; set; }
     }
 
 }

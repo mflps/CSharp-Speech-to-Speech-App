@@ -52,30 +52,5 @@ namespace Microsoft.MT.Api
         public string Translation;
     }
 
-    //
-    // Messages from Client to Server. 
-    //
-
-    //TODO:remove
-    /*
-    /// <summary>
-    /// Defines a request to update features of an existing session.
-    /// </summary>
-    [DataContract]
-    public class UpdateFeaturesMessage
-    {
-        /// Message type identifier.
-        [DataMember(Name = "type")]
-        public string Type = "updateFeatures";
-        /// True if partial results should be provided to the client after the update.
-        [DataMember(Name = "partial")]
-        public bool SendPartialResults;
-        /// True if text-to-speech should be provided to the client after the update.
-        [DataMember(Name = "texttospeech")]
-        public string SendTextToSpeech;
-        /// Maximum number of alternative recognitions returned to the client after the update.
-        [DataMember(Name = "max-alternatives", EmitDefaultValue = false)]
-        public int MaxAlternatives;
-    }
-    */
+   
 }

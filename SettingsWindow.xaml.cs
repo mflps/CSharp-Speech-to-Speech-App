@@ -23,7 +23,7 @@ namespace S2SMtDemoClient
         {
             InitializeComponent();
             ClientID.Text = Properties.Settings.Default.ClientID;
-            ClientSecret.Text = Properties.Settings.Default.ClientID;
+            ClientSecret.Text = Properties.Settings.Default.ClientSecret;
         }
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)

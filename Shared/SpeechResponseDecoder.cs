@@ -121,7 +121,6 @@ namespace Microsoft.MT.Api.TestUtils
             this.stream = null;
         }
 
-        //TODO: change this so we simply consider the end-of-message flag instead of reading wav header.
         public void AppendData(ArraySegment<byte> data)
         {
             if (this.remainingBytes <= 0)
