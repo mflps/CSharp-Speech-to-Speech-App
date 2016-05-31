@@ -14,6 +14,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Net.Security;
 using System.Runtime.Serialization;
 using System.Text;
@@ -178,6 +179,13 @@ namespace S2SMtDemoClient
                 });
         }
 
+        private static string GetRequestId(HttpResponseMessage response)
+        {
+            IEnumerable<string> keys = null;
+            if (!response.Headers.TryGetValues("X-RequestId", out keys))
+                return null;
+            return keys.First();
+        }
 
         private async Task UpdateLanguageSettingsAsync() //build the URI for the call to get the languages - 
         {
@@ -185,17 +193,24 @@ namespace S2SMtDemoClient
             Uri baseUri = new Uri("https://" + baseUrl);
             Uri fullUri = new Uri(baseUri, "/Languages?api-version=1.0&scope=text,speech,tts");
 
-            using (HttpClient client = new HttpClient()) //'client' is the var - using statment ensures the dispose method is used even after an exception.
+            using (HttpClient client = new HttpClient()) //'client' is the var - using statement ensures the dispose method is used even after an exception.
             {
+                HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, fullUri);
+
+                // get language names for current UI culture:
+                request.Headers.Add("Accept-Language", CultureInfo.CurrentUICulture.TwoLetterISOLanguageName);
+                // add a client-side trace Id. In case of issues, one can contact support and provide this:
+                string traceId = "S2SMtDemoClient" + Guid.NewGuid().ToString();
+                request.Headers.Add("X-ClientTraceId", traceId);
+                Debug.Print("TraceId: {0}", traceId);
+
                 client.Timeout = TimeSpan.FromMilliseconds(2000);
-
-                HttpResponseMessage response = await client.GetAsync(fullUri); //make the async call to the web using the client var and passing the built up URI
-
+                HttpResponseMessage response = await client.SendAsync(request); //make the async call to the web using the client var and passing the built up URI
                 response.EnsureSuccessStatusCode(); //causes exception if the return is false
 
+                Debug.Print("Request Id returned: {0}", GetRequestId(response));
                 spokenLanguages = new Dictionary<string, string>(); //create two dictionaries to receive the languages and the voices data
                 voices = new Dictionary<string, List<TTsDetail>>();
-
 
                 JObject jResponse = JObject.Parse(await response.Content.ReadAsStringAsync()); //get the json from the async call with the response var created above, parse it and put it in a var called jResponse - JObject is a newton class
                 foreach (JProperty jTts in jResponse["tts"])
