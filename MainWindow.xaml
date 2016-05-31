@@ -35,6 +35,7 @@
                     <ComboBoxItem Content="api\speech\translate" IsSelected="True"/>
                     <ComboBoxItem Content="api\speech\detect-and-translate"/>
                 </ComboBox>
+                <Button x:Name="SettingsButton" Content="Account Settings" Grid.Column="1" HorizontalAlignment="Left" Margin="6,6" VerticalAlignment="Top" Width="Auto" Click="SettingsButton_Click" Background="#FFACACAC"/>
             </StackPanel>
             <Label x:Name="AudioBytesSentLabel" Grid.Row="0" Grid.Column="1" Content="000000000" VerticalAlignment="Top" HorizontalAlignment="Right" Width="80"/>
             <Label Grid.Row="1" Grid.Column="0" Content="Microphone/File input" VerticalAlignment="Center" />
@@ -42,19 +43,24 @@
             <TextBox x:Name="AudioFileInput" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" Margin="320,6,0,5" VerticalAlignment="Center" Width="400" Height="20"/>
             <Button x:Name="AudioFileInputButton" Background="#FFACACAC" Grid.Row="1" Grid.Column="1" Content="Select" HorizontalAlignment="Left" Margin="722,0,0,0" VerticalAlignment="Center" Width="60" Height="20" Click="AudioFileInputButton_Click"/>
             <Label Grid.Row="2" Grid.Column="0" Content="Speaker" VerticalAlignment="Center" />
-            <ComboBox x:Name="Speaker" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Width="300" />
+            <ComboBox x:Name="Speaker" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Width="300" SelectionChanged="Speaker_SelectionChanged" />
             <CheckBox x:Name="CutInputAudioCheckBox" Grid.Row="2" Grid.Column="1" Content="Cut input audio during TTS" HorizontalAlignment="Left" Margin="320,8,0,0" VerticalAlignment="Top"/>
             <Label x:Name="Language1Label" Grid.Row="3" Grid.Column="0" Content="From language" VerticalAlignment="Center" />
             <ComboBox x:Name="FromLanguage" Grid.Row="3" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Width="200" SelectionChanged="FromLanguage_SelectionChanged"/>
             <Label x:Name="Language2Label" Grid.Row="4" Grid.Column="0" Content="To language" VerticalAlignment="Center" />
-            <ComboBox x:Name="ToLanguage" Grid.Row="4" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Width="200" SelectionChanged="ToLanguage_SelectionChanged"/>
+            <StackPanel Orientation="Horizontal" Grid.Row="4" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center">
+                <ComboBox x:Name="ToLanguage" HorizontalAlignment="Left" VerticalAlignment="Center" Width="200" SelectionChanged="ToLanguage_SelectionChanged"/>
+                <CheckBox x:Name="ShowMiniWindow" Content="Show Mini Window" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                <Label Content="Lines to Show in Mini Window:" Margin="20,0,0,0"/>
+                <ComboBox x:Name="MiniWindow_Lines" Width="Auto" SelectionChanged="MiniWindow_Lines_SelectionChanged"/>
+            </StackPanel>
             <Label x:Name="VoiceLabel" Grid.Row="5" Grid.Column="0" Content="Voice" VerticalAlignment="Center" />
             <ComboBox x:Name="Voice" Grid.Row="5" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Width="120"/>
             <ComboBox x:Name="Voice2" Grid.Row="5" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Width="120" Margin="150,0,0,0"/>
             <Label Grid.Row="6" Grid.Column="0" Content="Features" VerticalAlignment="Center" />
             <StackPanel Orientation="Horizontal" Grid.Row="6" Grid.Column="1" VerticalAlignment="Center">
-                <CheckBox x:Name="FeaturePartials" Content="Partials" IsChecked="False" />
-                <CheckBox x:Name="FeatureTTS" Content="TTS" IsChecked="True" Margin="20,0,0,0" />
+                <CheckBox x:Name="FeaturePartials" Content="Partials" IsChecked="True" />
+                <CheckBox x:Name="FeatureTTS" Content="TTS" Margin="20,0,0,0" />
                 <CheckBox x:Name="FeatureTurnSignals" Content="TurnSignals" IsChecked="False" Margin="20,0,0,0" IsEnabled="False"/>
                 <CheckBox x:Name="FeatureAlternatives" Content="Alternatives" IsChecked="False" Margin="20,0,0,0" IsEnabled="False"/>
                 <CheckBox x:Name="FeatureContinuous" Content="Continuous recognition" IsChecked="True" Margin="20,0,0,0" IsEnabled="False"/>
