@@ -82,8 +82,6 @@
     </Compile>
     <Compile Include="Shared\AudioSource.cs">
     </Compile>
-    <Compile Include="Shared\ClientWebSocket.cs">
-    </Compile>
     <Compile Include="Shared\SpeechClient.cs">
     </Compile>
     <Compile Include="Shared\SpeechClientOptions.cs">

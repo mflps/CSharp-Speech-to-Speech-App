@@ -48,7 +48,6 @@ namespace S2SMtDemoClient
             Disconnecting
         }
 
-        private enum OperationMode { SpeechTranslate }
 
         private enum MessageKind  //list of items for use throughout the code
         {
@@ -60,8 +59,6 @@ namespace S2SMtDemoClient
         }
 
         private UiState currentState; //create a variable of enum type UiState
-
-        private OperationMode currentOperationMode;
 
         private Dictionary<string, string> spokenLanguages; //create dictionary of two strings
 
@@ -76,8 +73,6 @@ namespace S2SMtDemoClient
         private BinaryMessageDecoder audioReceived; //BianryMessageDecoder is a testutils class
 
         private string correlationId;
-
-        private string requestId;
 
         private SpeechClient s2smtClient; //SpeechClient is a class
 
@@ -150,7 +145,6 @@ namespace S2SMtDemoClient
             miniwindow.SetFontSize(Properties.Settings.Default.MiniWindow_Lines);
 
             
-            UpdateUiForOperationMode(OperationMode.SpeechTranslate); //call a function passing an enum object
             UpdateLanguageSettings(); //call a function with no arguments
             ShowMiniWindow.IsChecked = Properties.Settings.Default.ShowMiniWindow;
         }
@@ -517,11 +511,10 @@ namespace S2SMtDemoClient
 
             ConnectAsync(options, shouldSuspendInputAudioDuringTTS).ContinueWith((t) =>
             {
-                this.requestId = s2smtClient.RequestId;
                 if (t.IsFaulted || t.IsCanceled || !s2smtClient.IsConnected()) //t.isfaulted OR t.iscancelled OR NOT s2smtclient.isconnected() do the following
                 {
-                    this.Log(t.Exception, "E: Unable to connect: requestId='{0}', cid='{1}', elapsedMs='{2}'.",
-                        this.requestId, this.correlationId, watch.ElapsedMilliseconds);
+                    this.Log(t.Exception, "E: Unable to connect: cid='{0}', elapsedMs='{1}'.",
+                        this.correlationId, watch.ElapsedMilliseconds);
                     this.SafeInvoke(() => {
                         this.AutoSaveLogs();
                         this.UpdateUiState(UiState.ReadyToConnect);
@@ -560,8 +553,8 @@ namespace S2SMtDemoClient
                         // Start sending audio from the recoder.
                         recorder.StartRecording();
                     }
-                    this.Log("I: Connected: requestId='{0}', cid='{1}', elapsedMs='{2}'.",
-                        this.requestId, this.correlationId, watch.ElapsedMilliseconds);
+                    this.Log("I: Connected: cid='{0}', elapsedMs='{1}'.",
+                        this.correlationId, watch.ElapsedMilliseconds);
                     this.SafeInvoke(() => this.UpdateUiState(UiState.Connected));
                 }
             }).ContinueWith((t) => {
@@ -911,24 +904,6 @@ namespace S2SMtDemoClient
             if (bottom2 != null) this.BottomRun2.Text = bottom2;
         }
 
-        private void UpdateUiForOperationMode(OperationMode mode)
-        {
-            /*
-            this.currentOperationMode = mode;
-            if ((this.Language1Label == null) || (this.Language2Label == null)) return;
-
-            switch (this.currentOperationMode)
-            {
-                case OperationMode.SpeechTranslate:
-                default:
-                    this.Language1Label.Content = "Translate From";
-                    this.Language2Label.Content = "Translate To";
-                    this.VoiceLabel.Content = "Voice";
-                    this.UpdateVoiceComboBox(this.Voice, ToLanguage.SelectedItem as ComboBoxItem);
-                    break;
-            }
-            */
-        }
 
         //this method shows the audio input if an audio file is selected
         private void UpdateUiForInputAudioOnOff(bool isOn)
@@ -967,18 +942,8 @@ namespace S2SMtDemoClient
                 case UiState.Connected:
                     this.StartListening.IsEnabled = true;
                     this.AudioBytesSentLabel.Visibility = Visibility.Visible;
-                    if (this.currentOperationMode == OperationMode.SpeechTranslate)
-                    {
-                        this.SetMessage("Connected! After you start speaking, transcripts in the source language will show here...",
+                    this.SetMessage("Connected! After you start speaking, transcripts in the source language will show here...",
                             "...and translations to the target language will show here.", MessageKind.Status);
-                    }
-                    else
-                    {
-                        this.SetMessage("Connected! Recognition for language #1 will show here...",
-                            "Translation for language #1 will show here...", MessageKind.ChatDetect1);
-                        this.SetMessage("Recognition for language #2 will show here...",
-                            "Translation for language #2 will show here...", MessageKind.ChatDetect2);
-                    }
                     this.StartListening.Content = "Stop";
                     //this.TraceCmd.Text = this.GetTraceCmd();
                     this.Log("I: {0}", this.TraceCmd.Text);

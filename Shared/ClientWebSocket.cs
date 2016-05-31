@@ -277,6 +277,7 @@ namespace Microsoft.MT.Api.TestUtils
 
     #endregion
 
+#if false
     //TODO:remove and use standard ClientWebSocket.
     public sealed class ClientWebSocket : WebSocket
     {
@@ -314,7 +315,7 @@ namespace Microsoft.MT.Api.TestUtils
             if (Logging.On) Logging.Exit(Logging.WebSockets, this, ".ctor", null);
         }
 
-        #region Properties
+#region Properties
 
         public ClientWebSocketOptions Options { get { return options; } }
 
@@ -383,7 +384,7 @@ namespace Microsoft.MT.Api.TestUtils
         /// </summary>
         public string RequestId { get; private set; }
 
-        #endregion Properties
+#endregion Properties
 
         public Task ConnectAsync(Uri uri, CancellationToken cancellationToken)
         {
@@ -691,7 +692,7 @@ namespace Microsoft.MT.Api.TestUtils
             keepAliveInterval = WebSocket.DefaultKeepAliveInterval;
         }
 
-        #region HTTP Settings
+#region HTTP Settings
 
         // Note that some headers are restricted like Host.
         public void SetRequestHeader(string headerName, string headerValue)
@@ -780,9 +781,9 @@ namespace Microsoft.MT.Api.TestUtils
             }
         }
 
-        #endregion HTTP Settings
+#endregion HTTP Settings
 
-        #region WebSocket Settings
+#region WebSocket Settings
 
         public void SetBuffer(int receiveBufferSize, int sendBufferSize)
         {
@@ -856,9 +857,9 @@ namespace Microsoft.MT.Api.TestUtils
             }
         }
 
-        #endregion WebSocket settings
+#endregion WebSocket settings
 
-        #region Helpers
+#region Helpers
 
         internal void SetToReadOnly()
         {
@@ -874,6 +875,8 @@ namespace Microsoft.MT.Api.TestUtils
             }
         }
 
-        #endregion Helpers
+#endregion Helpers
     }
+
+#endif
 }

@@ -82,7 +82,7 @@ namespace Microsoft.MT.Api.TestUtils
 
         private SpeechClientOptions options;
         private CancellationToken cancellationToken;
-        private TestUtils.ClientWebSocket webSocketclient;
+        private ClientWebSocket webSocketclient;
         private Uri clientWsUri;
 
         public event EventHandler<ArraySegment<byte>> OnTextData;
@@ -131,7 +131,7 @@ namespace Microsoft.MT.Api.TestUtils
 
         public string Hostname { get { return this.options.Hostname; } }
 
-        public string RequestId { get { return this.webSocketclient.RequestId; } }
+        //TODO: replace this: public string RequestId { get { return this.webSocketclient.RequestId; } }
 
         public async Task Connect()
         {
