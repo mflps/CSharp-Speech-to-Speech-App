@@ -19,11 +19,7 @@ namespace Microsoft.MT.Api.TestUtils
         public string Profanity { get; set; }
         public Guid ClientAppId { get; set; }
         public string CorrelationId { get; set; }
-        /// <summary>
-        /// Indicates if the connection is through secured layer(SSL)
-        /// </summary>
-        public bool IsSecure { get; set; }
-    }
+        }
 
     /// <summary>
     /// Defines the set of parameters to configure the client in order to use Translate endpoint.

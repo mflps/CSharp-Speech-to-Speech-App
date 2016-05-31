@@ -6,7 +6,8 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
-
+//TODO:remove
+/*
 namespace Microsoft.MT.Api.Protocols.SpeechTranslation.DetectAndTranslate
 {
     /// <summary>
@@ -67,3 +68,4 @@ namespace Microsoft.MT.Api.Protocols.SpeechTranslation.DetectAndTranslate
     }
 
 }
+*/

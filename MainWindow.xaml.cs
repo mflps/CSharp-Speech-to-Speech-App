@@ -30,6 +30,15 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
+/*
+UI:
+no endpoint, use the same
+no dropdown for api, use the same url
+no secure flag -- always ssl
+no turn signals, no alternatives, always contin.reco
+no trace button
+*/
+
 namespace S2SMtDemoClient
 {
 
@@ -129,9 +138,6 @@ namespace S2SMtDemoClient
 
             Speaker.SelectedIndex = 0; //select an audio out device
 
-            // To make secure connections work with Redmond test servers
-            ServicePointManager.ServerCertificateValidationCallback = new RemoteCertificateValidationCallback(HttpsCertificateValidator.ValidateServerCertificate);
-
             UpdateUiForOperationMode(OperationMode.SpeechTranslate); //call a function passing an enum object
             UpdateLanguageSettings(); //call a function with no arguements
         }
@@ -158,6 +164,7 @@ namespace S2SMtDemoClient
 
         private void EndpointComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            //TODO:REMOVE THIS
             OperationMode mode = OperationMode.SpeechTranslate; //put the value of the enum into the mode var
             string modeStr = ((ComboBoxItem)this.EndpointComboBox.SelectedItem).Content.ToString();
             
@@ -314,19 +321,19 @@ namespace S2SMtDemoClient
 
             // Create the client
             TextMessageDecoder textDecoder;
-            string[] detectAndTranslateLanguages;
+            
             if (options.GetType() == typeof(SpeechTranslateClientOptions))
             {
                 s2smtClient = new SpeechClient((SpeechTranslateClientOptions)options, CancellationToken.None);
                 textDecoder = TextMessageDecoder.CreateTranslateDecoder();
-                detectAndTranslateLanguages = null;
             }
+            /*
             else if (options.GetType() == typeof(SpeechDetectAndTranslateClientOptions))
             {
                 s2smtClient = new SpeechClient((SpeechDetectAndTranslateClientOptions)options, CancellationToken.None);
                 textDecoder = TextMessageDecoder.CreateDetectAndTranslateDecoder();
                 detectAndTranslateLanguages = ((SpeechDetectAndTranslateClientOptions)options).Languages;
-            }
+            }*/
             else
             {
                 throw new InvalidOperationException("Type of SpeechClientOptions in not supported.");
@@ -363,6 +370,7 @@ namespace S2SMtDemoClient
                                 Log("Partial translation {0}: {1}", partial.Id, partial.Translation);
                                 this.SafeInvoke(() => SetMessage(partial.Recognition, partial.Translation, MessageKind.Chat));
                             }
+                            /*
                             if (msg is Microsoft.MT.Api.Protocols.SpeechTranslation.DetectAndTranslate.ResultMessage)
                             {
                                 var result = msg as Microsoft.MT.Api.Protocols.SpeechTranslation.DetectAndTranslate.ResultMessage;
@@ -395,6 +403,7 @@ namespace S2SMtDemoClient
                                     this.SafeInvoke(() => SetMessage("", "", msgKind));
                                 }
                             }
+                            */
                         }
                     });
             };
@@ -499,7 +508,6 @@ namespace S2SMtDemoClient
                 };
             }
             options.Hostname = BaseUri.Text;
-            options.IsSecure = SecureConnection.IsChecked.Value;
             options.AuthHeaderKey = "Authorization";
             options.AuthHeaderValue = ""; // set later in ConnectAsync.
             options.ClientAppId = new Guid("EA66703D-90A8-436B-9BD6-7A2707A2AD99");

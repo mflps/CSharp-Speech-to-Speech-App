@@ -277,6 +277,7 @@ namespace Microsoft.MT.Api.TestUtils
 
     #endregion
 
+    //TODO:remove and use standard ClientWebSocket.
     public sealed class ClientWebSocket : WebSocket
     {
         private readonly ClientWebSocketOptions options;

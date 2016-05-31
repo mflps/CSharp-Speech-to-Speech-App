@@ -108,7 +108,7 @@ namespace Microsoft.MT.Api.TestUtils
             {
                 query.AppendFormat("&profanity={0}", options.Profanity);
             }
-            this.clientWsUri = new Uri(string.Format("{0}://{1}/speech/translate?{2}&api-version=1.0", this.options.IsSecure ? "wss": "ws", this.Hostname, query.ToString()));
+            this.clientWsUri = new Uri(string.Format("{0}://{1}/speech/translate?{2}&api-version=1.0", "wss", this.Hostname, query.ToString()));
         }
 
         public SpeechClient(SpeechDetectAndTranslateClientOptions options, CancellationToken cancellationToken)
@@ -128,7 +128,7 @@ namespace Microsoft.MT.Api.TestUtils
             {
                 query.AppendFormat("&profanity={0}", options.Profanity);
             }
-            this.clientWsUri = new Uri(string.Format("{0}://{1}/speech/detect-and-translate?{2}&api-version=1.0", this.options.IsSecure ? "wss" : "ws", this.Hostname, query.ToString()));
+            this.clientWsUri = new Uri(string.Format("{0}://{1}/speech/detect-and-translate?{2}&api-version=1.0", "wss", this.Hostname, query.ToString()));
         }
 
         private void Init(SpeechClientOptions options, CancellationToken cancellationToken)
@@ -154,12 +154,7 @@ namespace Microsoft.MT.Api.TestUtils
 
         public async Task Connect()
         {
-            //validate the certificate for ssl requests
-            if (this.options.IsSecure)
-            {
-                ServicePointManager.ServerCertificateValidationCallback = new RemoteCertificateValidationCallback(HttpsCertificateValidator.ValidateServerCertificate);
-            }
-
+            
             await webSocketclient.ConnectAsync(this.clientWsUri, this.cancellationToken);
             // Start receive and send loops
             var receiveTask = Task.Run(() => this.StartReceiving())

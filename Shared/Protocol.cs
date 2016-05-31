@@ -31,23 +31,7 @@ namespace Microsoft.MT.Api
         public string Translation;
     }
 
-    /// <summary>
-    /// Defines a character span with a set of alternative recognitions.
-    /// </summary>
-    [DataContract]
-    public class Span
-    {
-        /// Zero-based starting character position of the span in the recognition.
-        [DataMember(Name= "start")]
-        public int Start;
-        /// Zero-based ending character position of the span in the recognition.
-        [DataMember(Name = "end")]
-        public int End;
-        /// Array of alternative recognitions.
-        [DataMember(Name = "alternatives")]
-        public string[] Alternatives;
-    }
-
+    
     /// <summary>
     /// Defines a final result.
     /// </summary>
@@ -63,9 +47,6 @@ namespace Microsoft.MT.Api
         /// Recognized text.
         [DataMember(Name = "recognition")]
         public string Recognition;
-        /// Alternative recognitions.
-        [DataMember(Name = "spans", EmitDefaultValue = false)]
-        public Span[] Spans;
         /// Translation of the recognized text.
         [DataMember(Name = "translation", EmitDefaultValue = false)]
         public string Translation;
@@ -75,6 +56,8 @@ namespace Microsoft.MT.Api
     // Messages from Client to Server. 
     //
 
+    //TODO:remove
+    /*
     /// <summary>
     /// Defines a request to update features of an existing session.
     /// </summary>
@@ -94,5 +77,5 @@ namespace Microsoft.MT.Api
         [DataMember(Name = "max-alternatives", EmitDefaultValue = false)]
         public int MaxAlternatives;
     }
-
+    */
 }
