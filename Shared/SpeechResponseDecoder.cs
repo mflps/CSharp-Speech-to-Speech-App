@@ -35,15 +35,19 @@ namespace Microsoft.MT.Api.TestUtils
             return new TextMessageDecoder(map);
         }
 
+        /*
         public static TextMessageDecoder CreateDetectAndTranslateDecoder()
         {
             var map = new Dictionary<string, Type>()
             {
                 { "final", typeof(Microsoft.MT.Api.Protocols.SpeechTranslation.DetectAndTranslate.FinalResultMessage) },
                 { "partial", typeof(Microsoft.MT.Api.Protocols.SpeechTranslation.DetectAndTranslate.PartialResultMessage) }
+
+
             };
             return new TextMessageDecoder(map);
         }
+        */ 
 
         private TextMessageDecoder(Dictionary<string,Type> mapper)
         {

@@ -26,15 +26,7 @@
                 <ColumnDefinition Width="150" />
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
-            <Label Grid.Row="0" Grid.Column="0" Content="Host + Endpoint" VerticalAlignment="Center" />
             <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="1">
-                <TextBox x:Name="BaseUri" HorizontalAlignment="Left" VerticalAlignment="Center" Text="dev.microsofttranslator.com" Width="200" />
-                <Button x:Name="UpdateHostButton" Content="Apply" Background="#FFACACAC" Margin="6,6" Width="60" Height="20" Click="UpdateHostButton_Click" />
-                <CheckBox x:Name="SecureConnection" Content="Secure" Margin="20,8,0,8" IsChecked="True" VerticalAlignment="Center" />
-                <ComboBox x:Name="EndpointComboBox" HorizontalAlignment="Left" Margin="20,5,0,0" VerticalAlignment="Top" Width="275" SelectionChanged="EndpointComboBox_SelectionChanged">
-                    <ComboBoxItem Content="api\speech\translate" IsSelected="True"/>
-                    <ComboBoxItem Content="api\speech\detect-and-translate"/>
-                </ComboBox>
                 <Button x:Name="SettingsButton" Content="Account Settings" Grid.Column="1" HorizontalAlignment="Left" Margin="6,6" VerticalAlignment="Top" Width="Auto" Click="SettingsButton_Click" Background="#FFACACAC"/>
             </StackPanel>
             <Label x:Name="AudioBytesSentLabel" Grid.Row="0" Grid.Column="1" Content="000000000" VerticalAlignment="Top" HorizontalAlignment="Right" Width="80"/>
@@ -56,14 +48,10 @@
             </StackPanel>
             <Label x:Name="VoiceLabel" Grid.Row="5" Grid.Column="0" Content="Voice" VerticalAlignment="Center" />
             <ComboBox x:Name="Voice" Grid.Row="5" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Width="120"/>
-            <ComboBox x:Name="Voice2" Grid.Row="5" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Width="120" Margin="150,0,0,0"/>
             <Label Grid.Row="6" Grid.Column="0" Content="Features" VerticalAlignment="Center" />
             <StackPanel Orientation="Horizontal" Grid.Row="6" Grid.Column="1" VerticalAlignment="Center">
                 <CheckBox x:Name="FeaturePartials" Content="Partials" IsChecked="True" />
                 <CheckBox x:Name="FeatureTTS" Content="TTS" Margin="20,0,0,0" />
-                <CheckBox x:Name="FeatureTurnSignals" Content="TurnSignals" IsChecked="False" Margin="20,0,0,0" IsEnabled="False"/>
-                <CheckBox x:Name="FeatureAlternatives" Content="Alternatives" IsChecked="False" Margin="20,0,0,0" IsEnabled="False"/>
-                <CheckBox x:Name="FeatureContinuous" Content="Continuous recognition" IsChecked="True" Margin="20,0,0,0" IsEnabled="False"/>
                 <Button x:Name="UpdateSettings" Content="Update" Background="#FFACACAC" Margin="20,0" Width="60" />
             </StackPanel>
             <Label Grid.Row="7" Grid.Column="0" Content="Profanity" VerticalAlignment="Center" />
@@ -88,7 +76,6 @@
                 <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="0">
                     <Button x:Name="StartListening" Content="Start" Background="#FFACACAC" Margin="0,2" Width="80" Click="StartListening_Click" />
                 </StackPanel>
-                <Button x:Name="TraceButton" Grid.Row="0" Grid.Column="2" Content="Trace" Background="#FFACACAC" Margin="0,2" Width="80" Click="TraceButton_Click" />
                 <Button x:Name="SaveLogs" Grid.Column="3" Content="Save logs" Background="#FFACACAC" Margin="0,2" Width="80" Click="SaveLogs_Click" />
                 <Button x:Name="ClearLogs" Grid.Column="4" Content="Clear logs" Background="#FFACACAC" Margin="0,2" Width="80" Click="ClearLogs_Click" />
                 <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="5">

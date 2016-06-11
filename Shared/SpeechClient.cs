@@ -82,7 +82,7 @@ namespace Microsoft.MT.Api.TestUtils
 
         private SpeechClientOptions options;
         private CancellationToken cancellationToken;
-        private TestUtils.ClientWebSocket webSocketclient;
+        private ClientWebSocket webSocketclient;
         private Uri clientWsUri;
 
         public event EventHandler<ArraySegment<byte>> OnTextData;
@@ -108,28 +108,9 @@ namespace Microsoft.MT.Api.TestUtils
             {
                 query.AppendFormat("&profanity={0}", options.Profanity);
             }
-            this.clientWsUri = new Uri(string.Format("{0}://{1}/speech/translate?{2}&api-version=1.0", this.options.IsSecure ? "wss": "ws", this.Hostname, query.ToString()));
+            this.clientWsUri = new Uri(string.Format("{0}://{1}/speech/translate?{2}&api-version=1.0", "wss", this.Hostname, query.ToString()));
         }
 
-        public SpeechClient(SpeechDetectAndTranslateClientOptions options, CancellationToken cancellationToken)
-        {
-            this.Init(options, cancellationToken);
-            StringBuilder query = new StringBuilder();
-            query.AppendFormat("languages={0}", string.Join(",", options.Languages).Replace(" ", ""));
-            if ((options.Voices != null) && (options.Voices.Length > 0))
-            {
-                query.AppendFormat("&voices={0}", string.Join(",", options.Voices).Replace(" ", ""));
-            }
-            if (!String.IsNullOrWhiteSpace(options.Features))
-            {
-                query.AppendFormat("&features={0}", options.Features);
-            }
-            if (!String.IsNullOrWhiteSpace(options.Profanity))
-            {
-                query.AppendFormat("&profanity={0}", options.Profanity);
-            }
-            this.clientWsUri = new Uri(string.Format("{0}://{1}/speech/detect-and-translate?{2}&api-version=1.0", this.options.IsSecure ? "wss" : "ws", this.Hostname, query.ToString()));
-        }
 
         private void Init(SpeechClientOptions options, CancellationToken cancellationToken)
         {
@@ -150,16 +131,11 @@ namespace Microsoft.MT.Api.TestUtils
 
         public string Hostname { get { return this.options.Hostname; } }
 
-        public string RequestId { get { return this.webSocketclient.RequestId; } }
+        //TODO: replace this: public string RequestId { get { return this.webSocketclient.RequestId; } }
 
         public async Task Connect()
         {
-            //validate the certificate for ssl requests
-            if (this.options.IsSecure)
-            {
-                ServicePointManager.ServerCertificateValidationCallback = new RemoteCertificateValidationCallback(HttpsCertificateValidator.ValidateServerCertificate);
-            }
-
+            
             await webSocketclient.ConnectAsync(this.clientWsUri, this.cancellationToken);
             // Start receive and send loops
             var receiveTask = Task.Run(() => this.StartReceiving())
