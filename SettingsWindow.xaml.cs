@@ -33,5 +33,15 @@ namespace S2SMtDemoClient
             Properties.Settings.Default.Save();
             this.Close();
         }
+
+        private void Label_MouseDown_Subscription(object sender, MouseButtonEventArgs e)
+        {
+            System.Diagnostics.Process.Start("https://datamarket.azure.com/dataset/bing/microsofttranslatorspeech");
+        }
+
+        private void Label_MouseDown_ClientID(object sender, MouseButtonEventArgs e)
+        {
+            System.Diagnostics.Process.Start("https://datamarket.azure.com/developer/applications");
+        }
     }
 }
