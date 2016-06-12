@@ -5,7 +5,7 @@
         Title="Speech-to-speech Translation Demo" Height="600" Width="950" MinHeight="500" MinWidth="800">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="280" />
+            <RowDefinition Height="285" />
             <RowDefinition Height="170" />
             <RowDefinition  />
         </Grid.RowDefinitions>
@@ -25,12 +25,14 @@
                 <ColumnDefinition Width="150" />
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
-            <Button x:Name="SettingsButton" Content="Account Settings" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Width="100" Click="SettingsButton_Click" Background="#FFACACAC" Margin="0,6"/>
+            <Button x:Name="SettingsButton" Content="Account Settings" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Width="100" Height="20" Click="SettingsButton_Click" Background="#FFACACAC" Margin="0,6"/>
             <Label x:Name="AudioBytesSentLabel" Grid.Row="0" Grid.Column="1" Content="000000000" VerticalAlignment="Center" HorizontalAlignment="Right" Width="80"/>
             <Label Grid.Row="1" Grid.Column="0" Content="Microphone/File input" VerticalAlignment="Center" />
-            <ComboBox x:Name="Mic" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Width="300" SelectionChanged="Mic_SelectionChanged" />
-            <TextBox x:Name="AudioFileInput" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" Margin="320,6,0,5" VerticalAlignment="Center" Width="400" Height="20"/>
-            <Button x:Name="AudioFileInputButton" Background="#FFACACAC" Grid.Row="1" Grid.Column="1" Content="Select" HorizontalAlignment="Left" Margin="722,0,0,0" VerticalAlignment="Center" Width="60" Height="20" Click="AudioFileInputButton_Click"/>
+            <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal">
+                <ComboBox x:Name="Mic" HorizontalAlignment="Left" VerticalAlignment="Center" Width="300" SelectionChanged="Mic_SelectionChanged" />
+                <TextBox x:Name="AudioFileInput" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Width="400" Height="20" Margin="5"/>
+                <Button x:Name="AudioFileInputButton" Background="#FFACACAC" Grid.Row="1" Grid.Column="1" Content="Select" HorizontalAlignment="Right" Margin="5" VerticalAlignment="Center" Width="60" Height="20" Click="AudioFileInputButton_Click"/>
+            </StackPanel>
             <Label Grid.Row="2" Grid.Column="0" Content="Speaker" VerticalAlignment="Center" />
             <ComboBox x:Name="Speaker" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Width="300" SelectionChanged="Speaker_SelectionChanged" />
             <Label x:Name="Language1Label" Grid.Row="3" Grid.Column="0" Content="From Language" VerticalAlignment="Center" />
