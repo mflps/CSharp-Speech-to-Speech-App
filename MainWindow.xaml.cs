@@ -130,7 +130,6 @@ namespace S2SMtDemoClient
             }
 
             Speaker.SelectedIndex = Properties.Settings.Default.SpeakerIndex;
-
             
             MiniWindow_Lines.Items.Add(new ComboBoxItem() { Content = "1" });
             MiniWindow_Lines.Items.Add(new ComboBoxItem() { Content = "2" });
@@ -148,6 +147,10 @@ namespace S2SMtDemoClient
             
             UpdateLanguageSettings(); //call a function with no arguments
             ShowMiniWindow.IsChecked = Properties.Settings.Default.ShowMiniWindow;
+            FeatureTTS.IsChecked = Properties.Settings.Default.TTS;
+            CutInputAudioCheckBox.IsChecked = Properties.Settings.Default.CutInputDuringTTS;
+            FeaturePartials.IsChecked = Properties.Settings.Default.PartialResults;
+
         }
 
 
@@ -156,6 +159,9 @@ namespace S2SMtDemoClient
         {
             if (miniwindow != null) miniwindow.Close();
             Properties.Settings.Default.ShowMiniWindow = ShowMiniWindow.IsChecked.Value;
+            Properties.Settings.Default.TTS = FeatureTTS.IsChecked.Value;
+            Properties.Settings.Default.CutInputDuringTTS = CutInputAudioCheckBox.IsChecked.Value;
+            Properties.Settings.Default.PartialResults = FeaturePartials.IsChecked.Value;
             Properties.Settings.Default.Save();
         }
 
@@ -199,10 +205,11 @@ namespace S2SMtDemoClient
 
                 // get language names for current UI culture:
                 request.Headers.Add("Accept-Language", CultureInfo.CurrentUICulture.TwoLetterISOLanguageName);
+
                 // add a client-side trace Id. In case of issues, one can contact support and provide this:
-                string traceId = "S2SMtDemoClient" + Guid.NewGuid().ToString();
-                request.Headers.Add("X-ClientTraceId", traceId);
-                Debug.Print("TraceId: {0}", traceId);
+                //string traceId = "S2SMtDemoClient" + Guid.NewGuid().ToString();
+                //request.Headers.Add("X-ClientTraceId", traceId);
+                //Debug.Print("TraceId: {0}", traceId);
 
                 client.Timeout = TimeSpan.FromMilliseconds(2000);
                 HttpResponseMessage response = await client.SendAsync(request); //make the async call to the web using the client var and passing the built up URI
@@ -983,8 +990,10 @@ namespace S2SMtDemoClient
             this.Voice.IsEnabled = isInputAllowed;
             this.FeaturePartials.IsEnabled = isInputAllowed;
             this.FeatureTTS.IsEnabled = isInputAllowed;
+            this.CutInputAudioCheckBox.IsEnabled = isInputAllowed;
             this.UpdateSettings.Visibility = Visibility.Collapsed;
             this.Profanity.IsEnabled = isInputAllowed;
+            this.ShowMiniWindow.IsEnabled = isInputAllowed;
 
             this.SaveLogs.IsEnabled = isInputAllowed;
             this.ClearLogs.IsEnabled = true;

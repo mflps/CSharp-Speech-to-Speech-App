@@ -178,5 +178,41 @@ namespace S2SMtDemoClient.Properties {
                 this["OutputDirectory"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool TTS {
+            get {
+                return ((bool)(this["TTS"]));
+            }
+            set {
+                this["TTS"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool CutInputDuringTTS {
+            get {
+                return ((bool)(this["CutInputDuringTTS"]));
+            }
+            set {
+                this["CutInputDuringTTS"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool PartialResults {
+            get {
+                return ((bool)(this["PartialResults"]));
+            }
+            set {
+                this["PartialResults"] = value;
+            }
+        }
     }
 }

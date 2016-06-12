@@ -5,9 +5,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:S2SMtDemoClient"
         mc:Ignorable="d"
-        Title="SettingsWindow" Height="130" Width="300">
+        Title="SettingsWindow" Height="150" Width="360">
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition></RowDefinition>
             <RowDefinition></RowDefinition>
             <RowDefinition></RowDefinition>
             <RowDefinition></RowDefinition>
@@ -17,9 +18,14 @@
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
         <Label Grid.Row="0" Grid.Column="0" x:Name="L1" Content="Client ID"/>
+        <TextBox Grid.Row="0" Grid.Column="1" x:Name="ClientID" Margin="0,4,4,0"/>
         <Label Grid.Row="1" Grid.Column ="0" x:Name="L2" Content="Client Secret"/>
-        <TextBox Grid.Row="0" Grid.Column="1" x:Name="ClientID" Margin="4,4,4,4"/>
-        <TextBox Grid.Row="1" Grid.Column="1" x:Name="ClientSecret" Margin="4,4,4,4"/>
-        <Button x:Name="SaveButton" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Right" Width="30" Margin="4,4,4,4" Content="Save" Click="SaveButton_Click"/>
+        <TextBox Grid.Row="1" Grid.Column="1" x:Name="ClientSecret" Margin="0,4,4,0"/>
+        <Button x:Name="SaveButton" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Right" Width="60" Margin="4,4,4,4" Content="Save" Click="SaveButton_Click"/>
+        <StackPanel Grid.ColumnSpan="2" Grid.Row="3" Grid.Column="0" Orientation="Horizontal" Margin="0,0,0,0">
+            <Label Content="Obtain a subscription" Mouse.MouseDown="Label_MouseDown_Subscription" Foreground="Blue"/>
+            <Label Content="or"/>
+            <Label Content="obtain a client ID and secret." Mouse.MouseDown="Label_MouseDown_ClientID" Foreground="Blue"/>
+        </StackPanel>
     </Grid>
 </Window>
