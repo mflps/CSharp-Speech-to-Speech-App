@@ -201,7 +201,7 @@ namespace S2SMtDemoClient
                 request.Headers.Add("Accept-Language", CultureInfo.CurrentUICulture.TwoLetterISOLanguageName);
                 // add a client-side trace Id. In case of issues, one can contact support and provide this:
                 string traceId = "S2SMtDemoClient" + Guid.NewGuid().ToString();
-                request.Headers.Add("X-ClientTraceId", traceId);
+                //request.Headers.Add("X-ClientTraceId", traceId);
                 Debug.Print("TraceId: {0}", traceId);
 
                 client.Timeout = TimeSpan.FromMilliseconds(2000);
