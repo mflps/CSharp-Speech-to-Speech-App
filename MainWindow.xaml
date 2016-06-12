@@ -2,7 +2,7 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
-        Title="Speech-to-speech Translation Demo" Height="600" Width="980" MinHeight="500" MinWidth="800">
+        Title="Speech-to-speech Translation Demo" Height="600" Width="950" MinHeight="500" MinWidth="800">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="280" />
@@ -33,21 +33,21 @@
             <Button x:Name="AudioFileInputButton" Background="#FFACACAC" Grid.Row="1" Grid.Column="1" Content="Select" HorizontalAlignment="Left" Margin="722,0,0,0" VerticalAlignment="Center" Width="60" Height="20" Click="AudioFileInputButton_Click"/>
             <Label Grid.Row="2" Grid.Column="0" Content="Speaker" VerticalAlignment="Center" />
             <ComboBox x:Name="Speaker" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Width="300" SelectionChanged="Speaker_SelectionChanged" />
-            <CheckBox x:Name="CutInputAudioCheckBox" Grid.Row="2" Grid.Column="1" Content="Cut input audio during TTS" HorizontalAlignment="Left" Margin="320,8,0,0" VerticalAlignment="Top"/>
             <Label x:Name="Language1Label" Grid.Row="3" Grid.Column="0" Content="From Language" VerticalAlignment="Center" />
             <ComboBox x:Name="FromLanguage" Grid.Row="3" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Width="200" SelectionChanged="FromLanguage_SelectionChanged"/>
             <Label x:Name="Language2Label" Grid.Row="4" Grid.Column="0" Content="To Language" VerticalAlignment="Center" />
             <StackPanel Orientation="Horizontal" Grid.Row="4" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center">
                 <ComboBox x:Name="ToLanguage" HorizontalAlignment="Left" VerticalAlignment="Center" Width="200" SelectionChanged="ToLanguage_SelectionChanged"/>
                 <CheckBox x:Name="ShowMiniWindow" Content="Show Mini Window" VerticalAlignment="Center" Margin="10,0,0,0"/>
-                <Label Content="Lines to Show in Mini Window:" Margin="20,0,0,0"/>
+                <Label Content="Lines to Show in Mini Window:" VerticalAlignment="Center" Margin="20,0,0,0"/>
                 <ComboBox x:Name="MiniWindow_Lines" Width="Auto" SelectionChanged="MiniWindow_Lines_SelectionChanged"/>
             </StackPanel>
             <Label x:Name="VoiceLabel" Grid.Row="5" Grid.Column="0" Content="Voice" VerticalAlignment="Center" />
             <StackPanel Orientation="Horizontal" Grid.Row="5" Grid.Column="1" VerticalAlignment="Center">
                 <ComboBox x:Name="Voice" Grid.Row="5" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Width="200"/>
                 <CheckBox x:Name="FeatureTTS" Content="TTS" Margin="10,0,0,0" VerticalAlignment="Center"/>
-                <CheckBox x:Name="FeaturePartials" Content="Partial Results" IsChecked="True" Margin="20,0,0,0" VerticalAlignment="Center"/>
+                <CheckBox x:Name="CutInputAudioCheckBox" Content="Cut input audio during TTS" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="20,0,0,0"/>
+                <CheckBox x:Name="FeaturePartials" Content="Partial Results" Margin="20,0,0,0" VerticalAlignment="Center"/>
                 <Button x:Name="UpdateSettings" Content="Update" Background="#FFACACAC" Margin="20,0" Width="60" VerticalAlignment="Center"/>
             </StackPanel>
             <Label Grid.Row="6" Grid.Column="0" Content="Profanity Filter" VerticalAlignment="Center" />
@@ -62,9 +62,8 @@
                     <RowDefinition  />
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="90" />
-                    <ColumnDefinition Width="45" />
-                    <ColumnDefinition Width="90" />
+                    <ColumnDefinition Width="120" />
+                    <ColumnDefinition Width="80" />
                     <ColumnDefinition Width="90" />
                     <ColumnDefinition Width="90" />
                     <ColumnDefinition />
@@ -72,14 +71,14 @@
                 <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="0">
                     <Button x:Name="StartListening" Content="Start" Background="#FFACACAC" Margin="0,2" Width="80" Click="StartListening_Click" />
                 </StackPanel>
-                <Button x:Name="SaveLogs" Grid.Column="3" Content="Save logs" Background="#FFACACAC" Margin="0,2" Width="80" Click="SaveLogs_Click" />
-                <Button x:Name="ClearLogs" Grid.Column="4" Content="Clear logs" Background="#FFACACAC" Margin="0,2" Width="80" Click="ClearLogs_Click" />
-                <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="5">
+                <Button x:Name="SaveLogs" Grid.Column="2" Content="Save logs" Background="#FFACACAC" Margin="5,2" Click="SaveLogs_Click" />
+                <Button x:Name="ClearLogs" Grid.Column="3" Content="Clear logs" Background="#FFACACAC" Margin="5,2" Click="ClearLogs_Click" />
+                <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="4">
                     <CheckBox x:Name="LogAutoSave" Content="Auto-save session log" Margin="5,0,0,0" IsChecked="True" VerticalAlignment="Center" />
                     <CheckBox x:Name="LogSentAudio" Content="Log audio sent" Margin="5,0,0,0" IsChecked="False" VerticalAlignment="Center" />
                     <CheckBox x:Name="LogReceivedAudio" Content="Log audio received (TTS)" Margin="5,0,0,0" VerticalAlignment="Center" IsChecked="True" />
                 </StackPanel>
-                <TextBox Grid.Row="1" Grid.ColumnSpan="6" x:Name="TraceCmd" VerticalAlignment="Top"  Text="" HorizontalAlignment="Stretch" Margin="0,5,5,0" />
+                <TextBox Grid.Row="1" Grid.ColumnSpan="5" x:Name="TraceCmd" VerticalAlignment="Top"  Text="" HorizontalAlignment="Stretch" Margin="0,5,5,0" Height="18" />
             </Grid>
             <Label x:Name="CutInputAudioLabel" Grid.Row="7" Grid.Column="0" Content="CUTTING INPUT AUDIO" Foreground="Blue" VerticalAlignment="Center" Visibility="Collapsed" />
         </Grid>
@@ -105,6 +104,6 @@
                 </TextBlock>
             </Border>
         </StackPanel>
-        <ListBox x:Name="Logs" Grid.Row="2" Margin="0" />
+        <ListBox x:Name="Logs" Grid.Row="2" Margin="2" />
     </Grid>
 </Window>
