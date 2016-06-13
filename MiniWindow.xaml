@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:S2SMtDemoClient"
         mc:Ignorable="d"
-        Title="Microsoft Translator" Height="96" Width="500" Opacity="0.8" BorderThickness="1" ShowInTaskbar="False" Topmost="True" ToolTip="Display Window" Margin="1">
+        Title="Translated by Microsoft Translator" Height="96" Width="500" Opacity="0.8" BorderThickness="2" ShowInTaskbar="False" Topmost="True" ToolTip="Display Window" Margin="1">
     <Grid>
         <TextBox x:Name="DisplayText" TextWrapping="Wrap"/>
     </Grid>
