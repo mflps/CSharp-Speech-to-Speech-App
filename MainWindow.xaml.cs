@@ -61,8 +61,8 @@ namespace S2SMtDemoClient
 
         private UiState currentState; //create a variable of enum type UiState
 
-        private Dictionary<string, string> spokenLanguages; //create dictionary of two strings
-
+        private Dictionary<string, string> spokenLanguages; //create dictionary for the speech translation langauges 
+        private Dictionary<string, string> textLanguages; //create dictionary for the text translation languages
         private Dictionary<string, List<TTsDetail>> voices; //convert a list into a dictionary and call it voices TTsDetails is a class in this file
 
         private WaveIn recorder; //WaveIn is a class
@@ -162,6 +162,7 @@ namespace S2SMtDemoClient
             Properties.Settings.Default.TTS = FeatureTTS.IsChecked.Value;
             Properties.Settings.Default.CutInputDuringTTS = CutInputAudioCheckBox.IsChecked.Value;
             Properties.Settings.Default.PartialResults = FeaturePartials.IsChecked.Value;
+            Properties.Settings.Default.ToLanguageIndex = ToLanguage.SelectedIndex;
             Properties.Settings.Default.Save();
         }
 
@@ -216,28 +217,33 @@ namespace S2SMtDemoClient
                 response.EnsureSuccessStatusCode(); //causes exception if the return is false
 
                 Debug.Print("Request Id returned: {0}", GetRequestId(response));
-                spokenLanguages = new Dictionary<string, string>(); //create two dictionaries to receive the languages and the voices data
+
+                //create dictionaries to hold the language specific data
+                spokenLanguages = new Dictionary<string, string>();
+                textLanguages = new Dictionary<string, string>();
                 voices = new Dictionary<string, List<TTsDetail>>();
 
                 JObject jResponse = JObject.Parse(await response.Content.ReadAsStringAsync()); //get the json from the async call with the response var created above, parse it and put it in a var called jResponse - JObject is a newton class
+
+                //Gather the set of TTS voices
                 foreach (JProperty jTts in jResponse["tts"])
                 {
                     JObject ttsDetails = (JObject)jTts.Value;
 
                     string code = jTts.Name;
-                    string locale = ttsDetails["locale"].ToString();
+                    string language = ttsDetails["language"].ToString();
                     string displayName = ttsDetails["displayName"].ToString();
                     string gender = ttsDetails["gender"].ToString();
 
-                    if (!voices.ContainsKey(locale)) //check dictionary for a specific key value
+                    if (!voices.ContainsKey(language)) //check dictionary for a specific key value
                     {
-                        voices.Add(locale, new List<TTsDetail>()); //add to the dictionary the locale key and a ttsDetail object
+                        voices.Add(language, new List<TTsDetail>()); //add to the dictionary the locale key and a ttsDetail object
                     }
 
-                    voices[locale].Add(new TTsDetail() { Code = code, DisplayName = string.Format("{0} ({1})", displayName, gender) });
+                    voices[language].Add(new TTsDetail() { Code = code, DisplayName = string.Format("{0} ({1})", displayName, gender) });
                 }
 
-                // From and To ASR languages
+                // Gather the set of speech translation languages
                 foreach (JProperty jSpeech in jResponse["speech"])
                 {
                     JObject languageDetails = (JObject)jSpeech.Value;
@@ -248,13 +254,27 @@ namespace S2SMtDemoClient
 
                 spokenLanguages = spokenLanguages.OrderBy(x => x.Value).ToDictionary(x => x.Key, x => x.Value);
                 FromLanguage.Items.Clear();
-                ToLanguage.Items.Clear();
                 foreach (var language in spokenLanguages)
                 {
-                    bool isSelected = (CultureInfo.CurrentUICulture.Name.Equals(language.Key, StringComparison.OrdinalIgnoreCase)) ? true : false;
-                    FromLanguage.Items.Add(new ComboBoxItem() { Content = language.Value, Tag = language.Key, IsSelected = isSelected });
+                    FromLanguage.Items.Add(new ComboBoxItem() { Content = language.Value, Tag = language.Key});
+                }
+
+                // Gather the set of text translation languages
+                foreach (JProperty jText in jResponse["text"])
+                {
+                    JObject languageDetails = (JObject)jText.Value;
+                    string code = jText.Name;
+                    string displayName = languageDetails["name"].ToString();
+                    textLanguages.Add(code, displayName);
+                }
+
+                textLanguages = textLanguages.OrderBy(x => x.Value).ToDictionary(x => x.Key, x => x.Value);
+                ToLanguage.Items.Clear();
+                foreach (var language in textLanguages)
+                {
                     ToLanguage.Items.Add(new ComboBoxItem() { Content = language.Value, Tag = language.Key });
                 }
+
 
                 ToLanguage.SelectedIndex = Properties.Settings.Default.ToLanguageIndex;
                 FromLanguage.SelectedIndex = Properties.Settings.Default.FromLanguageIndex;
@@ -265,7 +285,6 @@ namespace S2SMtDemoClient
         {
             var voiceCombo = this.Voice;
             this.UpdateVoiceComboBox(voiceCombo, ToLanguage.SelectedItem as ComboBoxItem);
-            Properties.Settings.Default.ToLanguageIndex = ToLanguage.SelectedIndex;
             miniwindow.DisplayText.Language = System.Windows.Markup.XmlLanguage.GetLanguage(((ComboBoxItem)this.ToLanguage.SelectedItem).Tag.ToString());
         }
 
@@ -279,12 +298,24 @@ namespace S2SMtDemoClient
             voiceComboBox.Items.Clear();
             if (languageSelectedItem != null)
             {
-                var selectedVoice = voices[languageSelectedItem.Tag.ToString()];
-                foreach (var voice in selectedVoice)
+                if (voices.ContainsKey(languageSelectedItem.Tag.ToString())) 
                 {
-                    voiceComboBox.Items.Add(new ComboBoxItem() { Content = voice.DisplayName, Tag = voice.Code });
+                    var selectedVoice = voices[languageSelectedItem.Tag.ToString()];
+                    foreach (var voice in selectedVoice)
+                    {
+                        voiceComboBox.Items.Add(new ComboBoxItem() { Content = voice.DisplayName, Tag = voice.Code });
+                    }
+                    voiceComboBox.SelectedIndex = 0;
+                    FeatureTTS.IsEnabled = true;
+                    CutInputAudioCheckBox.IsEnabled = true;
+                    voiceComboBox.IsEnabled = true;
                 }
-                voiceComboBox.SelectedIndex = 0;
+                else
+                {
+                    FeatureTTS.IsEnabled = false;
+                    CutInputAudioCheckBox.IsEnabled = false;
+                    voiceComboBox.IsEnabled = false;
+                }
             }
         }
         private void Mic_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -427,12 +458,12 @@ namespace S2SMtDemoClient
 
             Stopwatch watch = Stopwatch.StartNew();
             UpdateUiState(UiState.Connecting);
-            miniwindow.Show();
+            if(ShowMiniWindow.IsChecked.Value) miniwindow.Show();
             //This section is putting default values in case there are missing values in the UI
             // Minimal validation
             if (this.IsMissingInput(this.FromLanguage.SelectedItem, "source language")) return;
             if (this.IsMissingInput(this.ToLanguage.SelectedItem, "target language")) return;
-            if (this.IsMissingInput(this.Voice.SelectedItem, "voice")) return;
+            //if (this.IsMissingInput(this.Voice.SelectedItem, "voice")) return;
             if (this.IsMissingInput(this.Profanity.SelectedItem, "profanity filter")) return;
             if (this.IsMissingInput(this.Mic.SelectedItem, "microphone")) return;
             if (this.IsMissingInput(this.Speaker.SelectedItem, "speaker")) return;
@@ -460,11 +491,17 @@ namespace S2SMtDemoClient
 
             // Setup speech translation client options
             SpeechClientOptions options;
+
+            string voicename = "";
+            if (this.Voice.SelectedItem != null)
+            {
+                voicename = ((ComboBoxItem)this.Voice.SelectedItem).Tag.ToString();
+            }
             options = new SpeechTranslateClientOptions()
             {
                 TranslateFrom = ((ComboBoxItem)this.FromLanguage.SelectedItem).Tag.ToString(),
                 TranslateTo = ((ComboBoxItem)this.ToLanguage.SelectedItem).Tag.ToString(),
-                Voice = ((ComboBoxItem)this.Voice.SelectedItem).Tag.ToString(),
+                Voice = voicename,
             };
             
             options.Hostname = baseUrl;
@@ -987,10 +1024,19 @@ namespace S2SMtDemoClient
             this.Speaker.IsEnabled = isInputAllowed;
             this.FromLanguage.IsEnabled = isInputAllowed;
             this.ToLanguage.IsEnabled = isInputAllowed;
-            this.Voice.IsEnabled = isInputAllowed;
             this.FeaturePartials.IsEnabled = isInputAllowed;
-            this.FeatureTTS.IsEnabled = isInputAllowed;
-            this.CutInputAudioCheckBox.IsEnabled = isInputAllowed;
+            if (Voice.SelectedItem != null)
+            {
+                this.Voice.IsEnabled = isInputAllowed;
+                this.FeatureTTS.IsEnabled = isInputAllowed;
+                this.CutInputAudioCheckBox.IsEnabled = isInputAllowed;
+            }
+            else
+            {
+                this.Voice.IsEnabled = false;
+                this.FeatureTTS.IsEnabled = false;
+                this.CutInputAudioCheckBox.IsEnabled = false;
+            }
             this.UpdateSettings.Visibility = Visibility.Collapsed;
             this.Profanity.IsEnabled = isInputAllowed;
             this.ShowMiniWindow.IsEnabled = isInputAllowed;
