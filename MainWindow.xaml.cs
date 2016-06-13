@@ -147,12 +147,13 @@ namespace S2SMtDemoClient
             miniwindow.SetFontSize(Properties.Settings.Default.MiniWindow_Lines);
 
             
-            UpdateLanguageSettings(); //call a function with no arguments
             ShowMiniWindow.IsChecked = Properties.Settings.Default.ShowMiniWindow;
             FeatureTTS.IsChecked = Properties.Settings.Default.TTS;
             CutInputAudioCheckBox.IsChecked = Properties.Settings.Default.CutInputDuringTTS;
             FeaturePartials.IsChecked = Properties.Settings.Default.PartialResults;
+            Voice.SelectedIndex = Properties.Settings.Default.VoiceIndex;
 
+            UpdateLanguageSettings(); //call a function with no arguments
         }
 
 
@@ -165,6 +166,7 @@ namespace S2SMtDemoClient
             Properties.Settings.Default.CutInputDuringTTS = CutInputAudioCheckBox.IsChecked.Value;
             Properties.Settings.Default.PartialResults = FeaturePartials.IsChecked.Value;
             Properties.Settings.Default.ToLanguageIndex = ToLanguage.SelectedIndex;
+            Properties.Settings.Default.VoiceIndex = Voice.SelectedIndex;
             Properties.Settings.Default.Save();
         }
 
@@ -307,7 +309,7 @@ namespace S2SMtDemoClient
                     {
                         voiceComboBox.Items.Add(new ComboBoxItem() { Content = voice.DisplayName, Tag = voice.Code });
                     }
-                    voiceComboBox.SelectedIndex = 0;
+                    voiceComboBox.SelectedIndex = Math.Min(Math.Abs(Voice.SelectedIndex), voiceComboBox.Items.Count-1);
                     FeatureTTS.IsEnabled = true;
                     CutInputAudioCheckBox.IsEnabled = true;
                     voiceComboBox.IsEnabled = true;
