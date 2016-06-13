@@ -83,6 +83,8 @@ namespace S2SMtDemoClient
 
         private BufferedWaveProvider playerAudioInputWaveProvider;
 
+        private string finaltranslationhistory = "";
+
         private int textToSpeechBytes = 0;
 
         // If (DateTime.Now < suspendInputAudioUntil) then ignore input audio to avoid echo.
@@ -145,12 +147,13 @@ namespace S2SMtDemoClient
             miniwindow.SetFontSize(Properties.Settings.Default.MiniWindow_Lines);
 
             
-            UpdateLanguageSettings(); //call a function with no arguments
             ShowMiniWindow.IsChecked = Properties.Settings.Default.ShowMiniWindow;
             FeatureTTS.IsChecked = Properties.Settings.Default.TTS;
             CutInputAudioCheckBox.IsChecked = Properties.Settings.Default.CutInputDuringTTS;
             FeaturePartials.IsChecked = Properties.Settings.Default.PartialResults;
+            Voice.SelectedIndex = Properties.Settings.Default.VoiceIndex;
 
+            UpdateLanguageSettings(); //call a function with no arguments
         }
 
 
@@ -163,6 +166,7 @@ namespace S2SMtDemoClient
             Properties.Settings.Default.CutInputDuringTTS = CutInputAudioCheckBox.IsChecked.Value;
             Properties.Settings.Default.PartialResults = FeaturePartials.IsChecked.Value;
             Properties.Settings.Default.ToLanguageIndex = ToLanguage.SelectedIndex;
+            Properties.Settings.Default.VoiceIndex = Voice.SelectedIndex;
             Properties.Settings.Default.Save();
         }
 
@@ -305,7 +309,7 @@ namespace S2SMtDemoClient
                     {
                         voiceComboBox.Items.Add(new ComboBoxItem() { Content = voice.DisplayName, Tag = voice.Code });
                     }
-                    voiceComboBox.SelectedIndex = 0;
+                    voiceComboBox.SelectedIndex = Math.Min(Math.Abs(Voice.SelectedIndex), voiceComboBox.Items.Count-1);
                     FeatureTTS.IsEnabled = true;
                     CutInputAudioCheckBox.IsEnabled = true;
                     voiceComboBox.IsEnabled = true;
@@ -410,6 +414,7 @@ namespace S2SMtDemoClient
                                 Log("Final recognition {0}: {1}", final.Id, final.Recognition);
                                 Log("Final translation {0}: {1}", final.Id, final.Translation);
                                 this.SafeInvoke(() => SetMessage(final.Recognition, final.Translation, MessageKind.Chat));
+                                finaltranslationhistory = final.Translation + "\n" + finaltranslationhistory.Substring(0, Math.Min(500, finaltranslationhistory.Length));
                             }
                             if (msg.GetType() == typeof(PartialResultMessage))
                             {
@@ -958,7 +963,7 @@ namespace S2SMtDemoClient
             if (bottom1 != null)
             {
                 this.BottomRun1.Text = bottom1;
-                if (kind == MessageKind.Chat) miniwindow.DisplayText.Text = bottom1;
+                if (kind == MessageKind.Chat) miniwindow.DisplayText.Text = bottom1 + "\n" + finaltranslationhistory;
             }
             if (bottom2 != null) this.BottomRun2.Text = bottom2;
         }

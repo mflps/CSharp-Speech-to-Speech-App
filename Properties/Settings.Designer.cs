@@ -214,5 +214,17 @@ namespace S2SMtDemoClient.Properties {
                 this["PartialResults"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int VoiceIndex {
+            get {
+                return ((int)(this["VoiceIndex"]));
+            }
+            set {
+                this["VoiceIndex"] = value;
+            }
+        }
     }
 }
