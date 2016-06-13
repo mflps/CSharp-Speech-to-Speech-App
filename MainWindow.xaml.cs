@@ -458,12 +458,12 @@ namespace S2SMtDemoClient
 
             Stopwatch watch = Stopwatch.StartNew();
             UpdateUiState(UiState.Connecting);
-            miniwindow.Show();
+            if(ShowMiniWindow.IsChecked.Value) miniwindow.Show();
             //This section is putting default values in case there are missing values in the UI
             // Minimal validation
             if (this.IsMissingInput(this.FromLanguage.SelectedItem, "source language")) return;
             if (this.IsMissingInput(this.ToLanguage.SelectedItem, "target language")) return;
-            if (this.IsMissingInput(this.Voice.SelectedItem, "voice")) return;
+            //if (this.IsMissingInput(this.Voice.SelectedItem, "voice")) return;
             if (this.IsMissingInput(this.Profanity.SelectedItem, "profanity filter")) return;
             if (this.IsMissingInput(this.Mic.SelectedItem, "microphone")) return;
             if (this.IsMissingInput(this.Speaker.SelectedItem, "speaker")) return;
@@ -491,11 +491,17 @@ namespace S2SMtDemoClient
 
             // Setup speech translation client options
             SpeechClientOptions options;
+
+            string voicename = "";
+            if (this.Voice.SelectedItem != null)
+            {
+                voicename = ((ComboBoxItem)this.Voice.SelectedItem).Tag.ToString();
+            }
             options = new SpeechTranslateClientOptions()
             {
                 TranslateFrom = ((ComboBoxItem)this.FromLanguage.SelectedItem).Tag.ToString(),
                 TranslateTo = ((ComboBoxItem)this.ToLanguage.SelectedItem).Tag.ToString(),
-                Voice = ((ComboBoxItem)this.Voice.SelectedItem).Tag.ToString(),
+                Voice = voicename,
             };
             
             options.Hostname = baseUrl;
@@ -1018,10 +1024,19 @@ namespace S2SMtDemoClient
             this.Speaker.IsEnabled = isInputAllowed;
             this.FromLanguage.IsEnabled = isInputAllowed;
             this.ToLanguage.IsEnabled = isInputAllowed;
-            this.Voice.IsEnabled = isInputAllowed;
             this.FeaturePartials.IsEnabled = isInputAllowed;
-            this.FeatureTTS.IsEnabled = isInputAllowed;
-            this.CutInputAudioCheckBox.IsEnabled = isInputAllowed;
+            if (Voice.SelectedItem != null)
+            {
+                this.Voice.IsEnabled = isInputAllowed;
+                this.FeatureTTS.IsEnabled = isInputAllowed;
+                this.CutInputAudioCheckBox.IsEnabled = isInputAllowed;
+            }
+            else
+            {
+                this.Voice.IsEnabled = false;
+                this.FeatureTTS.IsEnabled = false;
+                this.CutInputAudioCheckBox.IsEnabled = false;
+            }
             this.UpdateSettings.Visibility = Visibility.Collapsed;
             this.Profanity.IsEnabled = isInputAllowed;
             this.ShowMiniWindow.IsEnabled = isInputAllowed;
