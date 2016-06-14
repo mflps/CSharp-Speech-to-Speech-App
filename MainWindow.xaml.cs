@@ -160,6 +160,7 @@ namespace S2SMtDemoClient
 
         private void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
+            Disconnect();
             if (miniwindow != null) miniwindow.Close();
             Properties.Settings.Default.ShowMiniWindow = ShowMiniWindow.IsChecked.Value;
             Properties.Settings.Default.TTS = FeatureTTS.IsChecked.Value;
@@ -168,11 +169,6 @@ namespace S2SMtDemoClient
             Properties.Settings.Default.ToLanguageIndex = ToLanguage.SelectedIndex;
             Properties.Settings.Default.VoiceIndex = Voice.SelectedIndex;
             Properties.Settings.Default.Save();
-        }
-
-        private void UpdateHostButton_Click(object sender, RoutedEventArgs e) //this just calls the function right below it.
-        {
-            UpdateLanguageSettings();
         }
 
         private void UpdateLanguageSettings() //this function gets the language list from service by calling updatelanguagesettingsasync that method calls the api
@@ -216,7 +212,7 @@ namespace S2SMtDemoClient
                 //request.Headers.Add("X-ClientTraceId", traceId);
                 //Debug.Print("TraceId: {0}", traceId);
 
-                client.Timeout = TimeSpan.FromMilliseconds(2000);
+                client.Timeout = TimeSpan.FromMilliseconds(5000);
                 HttpResponseMessage response = await client.SendAsync(request); //make the async call to the web using the client var and passing the built up URI
                 response.EnsureSuccessStatusCode(); //causes exception if the return is false
 
@@ -371,9 +367,10 @@ namespace S2SMtDemoClient
             string ADMTokenUri = "https://datamarket.accesscontrol.windows.net/v2/OAuth2-13";
             ADMToken ADMAuthenticator = new ADMToken(ADMTokenUri, ADMScope);
             options.AuthHeaderValue = await ADMAuthenticator.GetToken(admClientId, admClientSecret);
-            if (string.IsNullOrEmpty(options.AuthHeaderValue))
+            if (options.AuthHeaderValue.Length < 10)
             {
-                throw new InvalidDataException("Failed to get an authentication token.");
+                SetMessage(String.Format("Please enter ClientID and Secret in the Account Settings."), "", MessageKind.Error);
+                UpdateUiState(UiState.MissingLanguageList);
             }
 
             // Create the client
@@ -990,7 +987,7 @@ namespace S2SMtDemoClient
                     break;
                 case UiState.MissingLanguageList:
                     this.StartListening.IsEnabled = false;
-                    this.SetMessage(string.Format("Failed to get language list. Please re-enter your account settings."), "", MessageKind.Error);
+                    this.SetMessage(string.Format("Invalid credentials. Please enter your account settings."), "", MessageKind.Error);
                     isInputAllowed = true;
                     break;
                 case UiState.ReadyToConnect:
@@ -1074,7 +1071,7 @@ namespace S2SMtDemoClient
 
         private void SettingsWindowClosing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            UpdateLanguageSettings();
+            UpdateUiState(UiState.ReadyToConnect);
         }
 
         private void Speaker_SelectionChanged(object sender, SelectionChangedEventArgs e)
