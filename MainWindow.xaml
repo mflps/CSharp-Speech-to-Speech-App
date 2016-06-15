@@ -41,7 +41,7 @@
             <StackPanel Orientation="Horizontal" Grid.Row="4" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center">
                 <ComboBox x:Name="ToLanguage" HorizontalAlignment="Left" VerticalAlignment="Center" Width="200" SelectionChanged="ToLanguage_SelectionChanged"/>
                 <CheckBox x:Name="ShowMiniWindow" Content="Show Mini Window" VerticalAlignment="Center" Margin="10,0,0,0"/>
-                <Label Content="Lines to Show in Mini Window:" VerticalAlignment="Center" Margin="20,0,0,0"/>
+                <Label Content="Lines to show in Mini Window:" VerticalAlignment="Center" Margin="20,0,0,0"/>
                 <ComboBox x:Name="MiniWindow_Lines" Width="Auto" SelectionChanged="MiniWindow_Lines_SelectionChanged"/>
             </StackPanel>
             <Label x:Name="VoiceLabel" Grid.Row="5" Grid.Column="0" Content="Voice" VerticalAlignment="Center" />
@@ -71,14 +71,14 @@
                     <ColumnDefinition />
                 </Grid.ColumnDefinitions>
                 <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="0">
-                    <Button x:Name="StartListening" Content="Start" Background="#FFACACAC" Margin="0,2" Width="80" Click="StartListening_Click" />
+                    <Button x:Name="StartListening" Content="Start" Background="#FFACACAC" Margin="0,2" Width="80" Click="StartListening_Click" IsDefault="True" />
                 </StackPanel>
                 <Button x:Name="SaveLogs" Grid.Column="2" Content="Save logs" Background="#FFACACAC" Margin="5,2" Click="SaveLogs_Click" />
                 <Button x:Name="ClearLogs" Grid.Column="3" Content="Clear logs" Background="#FFACACAC" Margin="5,2" Click="ClearLogs_Click" />
                 <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="4">
-                    <CheckBox x:Name="LogAutoSave" Content="Auto-save session log" Margin="5,0,0,0" IsChecked="True" VerticalAlignment="Center" />
+                    <CheckBox x:Name="LogAutoSave" Content="Auto-save session log" Margin="5,0,0,0" VerticalAlignment="Center" />
                     <CheckBox x:Name="LogSentAudio" Content="Log audio sent" Margin="5,0,0,0" IsChecked="False" VerticalAlignment="Center" />
-                    <CheckBox x:Name="LogReceivedAudio" Content="Log audio received (TTS)" Margin="5,0,0,0" VerticalAlignment="Center" IsChecked="True" />
+                    <CheckBox x:Name="LogReceivedAudio" Content="Log audio received (TTS)" Margin="5,0,0,0" VerticalAlignment="Center" />
                 </StackPanel>
                 <TextBox Grid.Row="1" Grid.ColumnSpan="5" x:Name="TraceCmd" VerticalAlignment="Top"  Text="" HorizontalAlignment="Stretch" Margin="0,5,5,0" Height="18" />
             </Grid>

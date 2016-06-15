@@ -169,7 +169,7 @@ namespace S2SMtDemoClient.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Logs")]
+        [global::System.Configuration.DefaultSettingValueAttribute("TranslatorLogs")]
         public string OutputDirectory {
             get {
                 return ((string)(this["OutputDirectory"]));

@@ -554,8 +554,15 @@ namespace S2SMtDemoClient
             string logAudioFileName = null;
             if (LogSentAudio.IsChecked.Value || LogReceivedAudio.IsChecked.Value)
             {
-                string logAudioPath = System.IO.Path.Combine(Properties.Settings.Default.OutputDirectory, this.correlationId);
-                Directory.CreateDirectory(logAudioPath);
+                string logAudioPath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), Properties.Settings.Default.OutputDirectory);
+                try
+                {
+                    Directory.CreateDirectory(logAudioPath);
+                }
+                catch
+                {
+                    this.AddItemToLog(string.Format("Could not create folder {0}", logAudioPath));
+                }
 
                 if (LogSentAudio.IsChecked.Value)
                 {
@@ -777,21 +784,33 @@ namespace S2SMtDemoClient
             }
 
             string cid = String.IsNullOrEmpty(this.correlationId) ? "no-cid" : this.correlationId;
-            string filename = System.IO.Path.Combine(Properties.Settings.Default.OutputDirectory, string.Format("log-{0}.txt", cid));
-            using (var writer = new StreamWriter(filename))
+            string filename = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), Properties.Settings.Default.OutputDirectory, string.Format("TranslatorLog-{0}.txt", cid));
+            try
             {
-                for (int i = this.autoSaveFrom; i < Logs.Items.Count; i++)
+                System.IO.Directory.CreateDirectory(System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), Properties.Settings.Default.OutputDirectory));
+                using (var writer = new StreamWriter(filename))
                 {
-                    writer.WriteLine(Logs.Items[i].ToString());
+                    for (int i = this.autoSaveFrom; i < Logs.Items.Count; i++)
+                    {
+                        writer.WriteLine(Logs.Items[i].ToString());
+                    }
                 }
+                this.autoSaveFrom = this.Logs.Items.Count;
             }
-            this.autoSaveFrom = this.Logs.Items.Count;
+            catch
+            {
+                this.AddItemToLog(string.Format("Could not create log file: {0}", filename));
+            };
         }
 
         private void SaveLogs_Click(object sender, RoutedEventArgs e)
         {
-            if(!Directory.Exists(Properties.Settings.Default.OutputDirectory))
-                Directory.CreateDirectory(Properties.Settings.Default.OutputDirectory);
+            try
+            {
+                if (!Directory.Exists(System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), Properties.Settings.Default.OutputDirectory)))
+                    Directory.CreateDirectory(System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), Properties.Settings.Default.OutputDirectory));
+            }
+            catch { }
             var dlg = new System.Windows.Forms.SaveFileDialog();
             dlg.InitialDirectory = Properties.Settings.Default.OutputDirectory;
             dlg.FileName = string.Format("log-{0}.txt", String.IsNullOrEmpty(this.correlationId) ? "no-cid" : this.correlationId);

@@ -39,7 +39,7 @@
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="OutputDirectory" Type="System.String" Scope="User">
-      <Value Profile="(Default)">Logs</Value>
+      <Value Profile="(Default)">TranslatorLogs</Value>
     </Setting>
     <Setting Name="TTS" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
